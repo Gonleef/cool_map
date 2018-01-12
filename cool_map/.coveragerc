@@ -1,0 +1,3 @@
+[run]
+source = cool_map
+omit = cool_map/test*

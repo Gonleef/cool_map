@@ -35,9 +35,9 @@ setup(
     include_package_data=True,
     entry_points={
         'paste.app_factory': [
-            'main_server = cool_map:get_server',
-            'auth_server = auth:get_server',
-            'cache_server = auth:get_server',
+            'main_server = cool_map:get_app',
+            'auth_server = auth:get_app',
+            'cache_server = auth:get_app',
         ],
     },
 )

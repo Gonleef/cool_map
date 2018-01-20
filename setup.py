@@ -6,7 +6,9 @@ requires = [
     'plaster_pastedeploy',
     'pyramid_debugtoolbar',
     'waitress',
-    'SQLAlchemy'
+    'SQLAlchemy',
+    'Paste',
+    'WebOB'
 ]
 
 setup(
@@ -28,7 +30,6 @@ setup(
         'paste.app_factory': [
             'main_server = cool_map:get_app',
             'auth_server = auth:get_app',
-            'cache_server = auth:get_app',
         ],
     },
 )

@@ -6,9 +6,8 @@ requires = [
     'plaster_pastedeploy',
     'pyramid_debugtoolbar',
     'waitress',
-    'SQLAlchemy',
-    'Paste',
-    'WebOB'
+    'sqlalchemy',
+    'paste'
 ]
 
 setup(

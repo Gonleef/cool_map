@@ -1,0 +1,17 @@
+{% extends "core:templates/base.jinja2" %}
+
+{% block head %}{{ super() }}
+    <link rel="stylesheet" href="{{request.static_url('admin:static/header.css')}}">
+{% endblock %}
+
+{% block body %}
+    <header class="header">
+        <section>
+            тут заголовок + профиль
+        </section>
+    </header>
+
+    <main>
+        создание формы
+    </main>
+{% endblock body %}

@@ -1,0 +1,15 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    margin: 0 0 16px 0;
+    padding: 16px;
+    background-color: black;
+}
+
+.header>section {
+    margin: 0 auto;
+    width: 800px;
+}

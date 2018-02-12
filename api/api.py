@@ -48,14 +48,6 @@ def route(method: HTTPMethod, pattern: str, **settings):
     return _route(method, pattern, settings)
 
 
-def action(method: HTTPMethod, prefix: str = '/', suffix: str = '', **settings):
-    def decorator(wrapped):
-        settings[ATTR_DEPTH] = 1
-        pattern = prefix + wrapped.__name__ + suffix
-        return _route(method, pattern, settings)(wrapped)
-    return decorator
-
-
 def post(pattern: str, **settings):
     return route(HTTPMethod.POST, pattern, **settings)
 
@@ -64,12 +56,28 @@ def get(pattern: str, **settings):
     return route(HTTPMethod.GET, pattern, **settings)
 
 
-def action_post(prefix: str = '/', suffix: str = '', **settings):
-    return action(HTTPMethod.POST, prefix, suffix, **settings)
+def put(pattern: str, **settings):
+    return route(HTTPMethod.PUT, pattern, **settings)
+
+
+def action(method: HTTPMethod, prefix: str = '/', suffix: str = '', **settings):
+    def decorator(wrapped):
+        settings[ATTR_DEPTH] = 1
+        pattern = prefix + wrapped.__name__ + suffix
+        return _route(method, pattern, settings)(wrapped)
+    return decorator
 
 
 def action_get(prefix: str = '/', suffix: str = '', **settings):
     return action(HTTPMethod.GET, prefix, suffix, **settings)
+
+
+def action_post(prefix: str = '/', suffix: str = '', **settings):
+    return action(HTTPMethod.POST, prefix, suffix, **settings)
+
+
+def action_put(prefix: str = '/', suffix: str = '', **settings):
+    return action(HTTPMethod.PUT, prefix, suffix, **settings)
 
 
 class Api(object):

@@ -3,11 +3,11 @@ from pyramid.request import Request
 from pyramid.view import view_config
 
 
-@view_config(route_name='index', renderer='templates/index.jinja2')
-class Index(object):
+@view_config(route_name='user_permissions', renderer='templates/permissions.jinja2')
+class Permissions(object):
     def __init__(self, context, request: Request):
-        self.context = context
         self.request = request
+        self.context = context
         self.user = load_user(request)
 
     def __call__(self):

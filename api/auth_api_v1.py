@@ -3,23 +3,13 @@ from core.entities import FailResult
 from core.entities_sql import UserSql, SessionStateSql, create_transaction
 from core.permissions import Permissions
 from core.response import HTTPForbidden, HTTPOk, HTTPNotFound
+from core.urns import Urns
 
 
-@default(factory=lambda r: 'global:auth', permission=Permissions.Null)
+@default(factory=lambda r: Urns.Api.Auth, permission=Permissions.Null)
 class AuthApiV1(Api):
     def __init__(self, *args):
         super(AuthApiV1, self).__init__(args)
-
-    @action_post()
-    def register_user(self):
-        login = self.request.params.get('login')
-        email = self.request.params.get('email')
-        password = self.request.body.decode()
-
-        with create_transaction() as transaction:
-            state = UserSql(login, password, email)
-            transaction.add(state)
-            return HTTPOk()
 
     @action_post()
     def authenticate_by_pass(self):

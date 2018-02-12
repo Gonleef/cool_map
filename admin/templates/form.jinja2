@@ -1,0 +1,36 @@
+{% extends "base.jinja2" %}
+
+{% block base_main %}
+{% if not form_result.is_success %}
+
+    Fail
+
+{% else %}
+
+    <form>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="title-label">Название</span>
+            </div>
+            <input type="text" class="form-control" value="{{ form_result.data.title }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Описание</span>
+            </div>
+            <textarea class="form-control">{{ form_result.data.description }}</textarea>
+        </div><br>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Контент</span>
+            </div>
+            <textarea class="form-control">{{ form_result.data.content }}</textarea>
+        </div>
+
+        <button type="button" class="btn btn-primary">Primary</button>
+        <button type="button" class="btn btn-secondary">Secondary</button>
+        <button type="button" class="btn btn-danger">Danger</button>
+    </form>
+
+{% endif %}
+{% endblock %}

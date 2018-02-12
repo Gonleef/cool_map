@@ -74,3 +74,10 @@ class Answer(object):
         self.respondent_id = respondent_id
         self.form_id = form_id
         self.answer = answer
+
+
+class User(object):
+    def __init__(self, id: str, login: str, email: str):
+        self.id = id
+        self.login = login
+        self.email = email

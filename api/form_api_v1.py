@@ -1,10 +1,11 @@
-from api.api import Api, action_get, get, default
+from api.api import Api, get, default
 from core.entities import ItemsResult, FailResult
 from core.entities_sql import create_transaction, AnswerSql, FormSql
 from core.response import HTTPOk, HTTPNotFound
+from core.urns import Urns
 
 
-@default(factory=lambda r: 'global:form')
+@default(factory=lambda r: Urns.Api.Forms)
 class FormApiV1(Api):
     def __init__(self, *args):
         super(FormApiV1, self).__init__(args)

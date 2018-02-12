@@ -41,6 +41,12 @@ class UserSql(Base):
         self.password = password
         self.email = email
 
+    def val(self):
+        return User(
+            self.id,
+            self.login,
+            self.email)
+
 
 class SessionStateSql(Base):
     __table__ = Table('SessionState', Base.metadata, autoload=True, autoload_with=Engine)

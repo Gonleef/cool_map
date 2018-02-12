@@ -1,0 +1,22 @@
+{% extends "base.jinja2" %}
+{% set page = 'answers' %}
+
+{% block base_main %}
+
+    <div class="row">
+        {% for answer in answers %}
+        <div class="col-md-4">
+            <div class="card mb-4 box-shadow">
+                <!--img class="card-img-top" data-src=""-->
+                <div class="card-body">
+                    <h5 class="card-title">{{ answer.form_info.title }}</h5>
+                    <p class="card-text">{{ answer.form_info.description }}</p>
+                    <button type="button" class="btn btn-sm btn-outline-secondary">Редактировать</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger">Удалить</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

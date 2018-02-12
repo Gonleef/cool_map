@@ -3,9 +3,10 @@ from core.entities import Permission
 from core.entities_sql import create_transaction, PermissionSql
 from core.permissions import Permissions
 from core.response import HTTPOk, HTTPNotFound
+from core.urns import Urns
 
 
-@default(factory=lambda r: 'global:permission')
+@default(factory=lambda r: Urns.Api.Permissions)
 class PermissionApiV1(Api):
     def __init__(self, *args):
         super(PermissionApiV1, self).__init__(args)

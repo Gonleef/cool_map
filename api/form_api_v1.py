@@ -11,31 +11,30 @@ class FormApiV1(Api):
     def __init__(self, *args):
         super(FormApiV1, self).__init__(args)
 
-    @route(HTTPMethod.GET, 'form/{form_id}')
+    @route(HTTPMethod.GET, 'form/{id}')
     def get_form(self):
-        print(1)
-        form_id = self.request.matchdict.get('form_id')
+        id = self.request.matchdict.get('id')
         with create_transaction() as transaction:
             form = transaction.query(FormSql) \
-                .filter(FormSql.id == form_id) \
+                .filter(FormSql.id == id) \
                 .first()
             return HTTPOk(form.val()) if form \
                 else HTTPNotFound(FailResultSimple('FormNotFound', 'Форма не найдена'))
 
-    @route(HTTPMethod.DELETE, 'form/{form_id}')
+    @route(HTTPMethod.DELETE, 'form/{id}')
     def delete_form(self):
-        form_id = self.request.matchdict.get('form_id')
+        id = self.request.matchdict.get('id')
         with create_transaction() as transaction:
             deleted = transaction.query(FormSql) \
-                .filter(FormSql.id == form_id) \
+                .filter(FormSql.id == id) \
                 .delete()
             transaction.query(AnswerSql) \
-                .filter(AnswerSql.form_id == form_id) \
+                .filter(AnswerSql.form_id == id) \
                 .delete()
             return HTTPOk() if deleted \
                 else HTTPNotFound(FailResultSimple('FormNotFound', 'Форма не найдена'))
 
-    @route(HTTPMethod.GET, 'forms/for/{user_id}')
+    @route(HTTPMethod.GET, 'user/{user_id}/form')
     def get_forms(self):
         user_id = self.request.matchdict.get('user_id')
         skip = int(self.request.matchdict.get('skip', 0))
@@ -55,8 +54,39 @@ class FormApiV1(Api):
             items = list(map(lambda p: p.val().__dict__, answers))
             return HTTPOk(ItemsResult(items, skip, take, count))
 
-    @route(HTTPMethod.GET, 'answers/for/{user_id}')
-    def answer(self):
+    @route(HTTPMethod.GET, 'answer/{id}')
+    def get_answer(self):
+        id = self.request.matchdict.get('id')
+        with create_transaction() as transaction:
+            answer = transaction.query(AnswerSql) \
+                .filter(AnswerSql.id == id) \
+                .first()
+            return HTTPOk(answer.val()) if answer \
+                else HTTPNotFound(FailResultSimple('AnswerNotFound', 'Ответ не найдена'))
+
+    @route(HTTPMethod.DELETE, 'answer/{id}')
+    def delete_answer(self):
+        id = self.request.matchdict.get('id')
+        with create_transaction() as transaction:
+            deleted = transaction.query(AnswerSql) \
+                .filter(AnswerSql.id == id) \
+                .delete()
+            return HTTPOk() if deleted \
+                else HTTPNotFound(FailResultSimple('AnswerNotFound', 'Ответ не найдена'))
+
+    @route(HTTPMethod.POST, 'answer/{id}')
+    def set_answer(self):
+        id = self.request.matchdict.get('id')
+        answer = self.request.body.decode()
+        with create_transaction() as transaction:
+            deleted = transaction.query(AnswerSql) \
+                .filter(AnswerSql.id == id) \
+                .update({AnswerSql.answer: answer})
+            return HTTPOk() if deleted \
+                else HTTPNotFound(FailResultSimple('AnswerNotFound', 'Ответ не найдена'))
+
+    @route(HTTPMethod.GET, 'user/{user_id}/answer')
+    def get_answers(self):
         user_id = self.request.matchdict.get('user_id')
         skip = int(self.request.matchdict.get('skip', 0))
         take = int(self.request.matchdict.get('take', 50000))

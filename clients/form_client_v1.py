@@ -14,8 +14,33 @@ class FormClient(object):
     def __init__(self, auth: IAuthProvider):
         self.auth = auth
 
+    def get_answer(self, id: str):
+        request = Request.blank('/api/form/v1/answer/' + id)
+        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        response = request.get_response()
+        data = json.loads(response.body.decode())
+        return OperationResult.success(Answer(**data)) if response.status_code == HTTPStatus.OK \
+            else OperationResult.fail(FailResult(code=response.status_code, **data))
+
+    def delete_answer(self, id: str):
+        request = Request.blank('/api/form/v1/answer/' + id)
+        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        request.method = HTTPMethod.DELETE.value
+        response = request.get_response()
+        return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
+            else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
+
+    def set_answer(self, id: str, answer: str):
+        request = Request.blank('/api/form/v1/answer/' + id)
+        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        request.method = HTTPMethod.POST.value
+        request.body = answer.encode()
+        response = request.get_response()
+        return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
+            else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
+
     def get_answers(self, user_id: str, skip: int = 0, take: int = 50000):
-        request = Request.blank('/api/form/v1/answers/for/%s?skip=%d&take=%d' % (user_id, skip, take))
+        request = Request.blank('/api/form/v1/user/%s/answer?skip=%d&take=%d' % (user_id, skip, take))
         request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
         response = request.get_response()
         data = json.loads(response.body.decode())
@@ -42,7 +67,7 @@ class FormClient(object):
             else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
 
     def get_forms(self, user_id: str, skip: int = 0, take: int = 50000):
-        request = Request.blank('/api/form/v1/forms/for/%s?skip=%d&take=%d' % (user_id, skip, take))
+        request = Request.blank('/api/form/v1/user/%s/form?skip=%d&take=%d' % (user_id, skip, take))
         request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
         response = request.get_response()
         data = json.loads(response.body.decode())

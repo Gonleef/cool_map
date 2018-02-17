@@ -18,36 +18,58 @@ class Form(object):
         self.user = load_user(request)
 
     def __call__(self):
-        if self.request.method == HTTPMethod.GET.value:
-            if self.request.params.get('delete') == 'true':
-                return self.delete()
-
+        if self.request.method == HTTPMethod.POST.value:
             return self.edit()
         elif self.request.method == HTTPMethod.DELETE.value:
             return self.delete()
+        elif self.request.params.get('delete') == 'true':
+            return self.delete()
+        return self.get()
 
-    def edit(self):
-        form_id = self.request.matchdict.get('answer_id')
-        form_result = ApiClient(ConfigurationWrapper.get_auth()).form_client.get_form(form_id)
+    def get(self, success: str = None):
+        client = ApiClient(ConfigurationWrapper.get_auth())
+        answer_id = self.request.matchdict.get('answer_id')
+        answer_result = client.form_client.get_answer(answer_id)
+        if not answer_result.is_success:
+            return {
+                'user': self.user,
+                'error': answer_result.data
+            }
+        form_result = client.form_client.get_form(answer_result.data.form_id)
         if not form_result.is_success:
             return {
                 'user': self.user,
                 'error': form_result.data
             }
-
         inputs = json.loads(form_result.data.content)
-        print(inputs)
+        answers = json.loads(answer_result.data.answer)
+        for input_id in inputs:
+            inputs[input_id]['answer'] = answers.get(input_id)
         return {
+            'success': success,
             'user': self.user,
+            'answer_id': answer_id,
             'form': form_result.data,
             'inputs': inputs
         }
 
     def delete(self):
-        form_id = self.request.matchdict.get('answer_id')
-        result = ApiClient(ConfigurationWrapper.get_auth()).form_client.delete_form(form_id)
+        answer_id = self.request.matchdict.get('answer_id')
+        result = ApiClient(ConfigurationWrapper.get_auth()).form_client.delete_answer(answer_id)
         if not result.is_success:
-            logging.warning("Fail to delete form '%s': %s" % (form_id, result.data.message))
+            logging.warning("Fail to delete answer '%s': %s" % (answer_id, result.data.message))
         return HTTPTemporaryRedirect('/admin/answer')
 
-
+    def edit(self):
+        answer_id = self.request.matchdict.get('answer_id')
+        answer = dict()
+        for id in self.request.params:
+            answer[id] = self.request.params[id]
+        answer = json.dumps(answer)
+        result = ApiClient(ConfigurationWrapper.get_auth()).form_client.set_answer(answer_id, answer)
+        if not result.is_success:
+            return {
+                'user': self.user,
+                'error': result.data
+            }
+        return self.get('Новый ответ записан')

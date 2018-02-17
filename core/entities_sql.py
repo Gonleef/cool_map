@@ -115,17 +115,20 @@ class FormSql(Base):
 
 class AnswerSql(Base):
     __table__ = Table('Answer', Base.metadata, autoload=True, autoload_with=Engine)
+    id = __table__.c.Id
     respondent_id = __table__.c.RespondentId
     form_id = __table__.c.FormId
     answer = __table__.c.Answer
 
     def __init__(self, respondent_id: str, form_id: str, answer: str):
+        self.id = str(uuid.uuid4())
         self.respondent_id = respondent_id
         self.form_id = form_id
         self.answer = answer
 
     def val(self):
         return Answer(
+            self.id,
             self.respondent_id,
             self.form_id,
             self.answer)

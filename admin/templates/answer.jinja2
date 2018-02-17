@@ -5,52 +5,27 @@
         <div class="alert alert-danger mb-3" role="alert">{{ error.message }}</div>
     {% endif %}
 
+    {% if success %}
+        <div class="alert alert-success mb-3" role="alert">{{ success }}</div>
+    {% endif %}
+
     {% if form %}
-    <form>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="title-label">Название</span>
-            </div>
-            <input type="text" class="form-control" value="{{ form.title }}">
-        </div>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Описание</span>
-            </div>
-            <textarea class="form-control">{{ form.description }}</textarea>
-        </div><br>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Контент</span>
-            </div>
-            <textarea class="form-control">{{ form.content }}</textarea>
-        </div>
+    <p>
+        <h5>{{ form.title }}</h5>
+        <p>{{ form.description }}</p>
 
         {% if inputs %}
-        <hr>
-        <h5>Вопросы</h5>
-        {% for input in inputs %}
-            <div class="card mb-3">
-
+        <form method="post">
+            {% for id in inputs %}
                 <div class="col-md-12 mb-3 mt-3">
-                    <label for="question_{{ input.id }}">Вопрос</label>
-                    <input type="text" class="form-control" id="question_{{ input.id }}" placeholder="Введите вопрос" value="{{ input.label }}">
+                    <label for="{{ id }}">{{ inputs[id].label }}</label>
+                    <input type="text" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="Введите ответ" value="{{ inputs[id].answer }}">
                 </div>
+            {% endfor %}
 
-                <div class="col-md-2 mb-3">
-                    <label for="state">Тип</label>
-                    <select class="custom-select d-block w-100" id="state" required>
-                      <option {{ 'selected' if input.type == 'input' }} value="input">Input</option>
-                    </select>
-                </div>
-            </div>
-
-        {% endfor %}
-
-        <button type="button" class="btn btn-primary">Primary</button>
-        <button type="button" class="btn btn-secondary">Secondary</button>
-        <button type="button" class="btn btn-danger">Danger</button>
+            <button type="submit" class="btn btn-primary">Изменить</button>
+            <button type="button" class="btn btn-danger" onclick="location.href='/admin/answer/{{ answer_id }}?delete=true'">Удалить</button>
+        </form>
         {% endif %}
     {% endif %}
-    </form>
 {% endblock %}

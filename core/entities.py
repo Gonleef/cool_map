@@ -83,7 +83,8 @@ class Form(object):
 
 
 class Answer(object):
-    def __init__(self, respondent_id: str, form_id: str, answer: str):
+    def __init__(self, id: str, respondent_id: str, form_id: str, answer: str):
+        self.id = id
         self.respondent_id = respondent_id
         self.form_id = form_id
         self.answer = answer

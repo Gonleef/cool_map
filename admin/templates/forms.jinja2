@@ -2,21 +2,30 @@
 {% set page = 'forms' %}
 
 {% block base_main %}
+    {% if error %}
+        <div class="alert alert-danger mb-3" role="alert">{{ error.message }}</div>
+    {% endif %}
 
-        <div class="row">
-            {% for form in forms %}
-            <div class="col-md-4">
-                <div class="card mb-4 box-shadow">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ form.title }}</h5>
-                        <p class="card-text">{{ form.description }}</p>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href='/admin/form/{{ form.id }}'">
-                            Редактировать</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger">Удалить</button>
-                    </div>
+    {% if forms %}
+    {% if not forms.items %}
+        <div class="alert alert-success mb-3" role="alert">Вы еще не ответили ни на однин опрос</div>
+    {% endif %}
+
+    <div class="row">
+        {% for form in forms.items %}
+        <div class="col-md-4">
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                    <h5 class="card-title">{{ form.title }}</h5>
+                    <p class="card-text">{{ form.description }}</p>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href='/admin/form/{{ form.id }}'">
+                        Редактировать</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="location.href='/admin/form/{{ form.id }}?delete=true'">Удалить</button>
                 </div>
             </div>
-            {% endfor %}
         </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
 {% endblock %}

@@ -9,6 +9,13 @@ ATTR_ADD_ROUTES = '__add_routes__'
 ATTR_DEPTH = '__depth__'
 
 
+def default(**settings):
+    def decorator(wrapped):
+        wrapped.__init__.__dict__.update(settings)
+        return wrapped
+    return decorator
+
+
 def _route(method: HTTPMethod, pattern: str, settings):
     def decorator(wrapped):
         depth = settings.pop(ATTR_DEPTH, 0)
@@ -24,60 +31,16 @@ def _route(method: HTTPMethod, pattern: str, settings):
     return decorator
 
 
-def default(**settings):
-    def decorator(wrapped):
-        wrapped.__init__.__dict__.update(settings)
-        return wrapped
-    return decorator
-
-
-def route(
-        method: HTTPMethod,
-        pattern: str = None,
-        auto_pattern: bool = True,
-        auto_pattern_prefix: str = '/',
-        auto_pattern_suffix: str = '',
-        **settings):
-    def decorator(wrapped):
-        _pattern = pattern if not auto_pattern else auto_pattern_prefix + wrapped.__name__ + auto_pattern_suffix
-        return _route(method, _pattern, settings)(wrapped)
-    return decorator
-
-
 def route(method: HTTPMethod, pattern: str, **settings):
     return _route(method, pattern, settings)
 
 
-def post(pattern: str, **settings):
-    return route(HTTPMethod.POST, pattern, **settings)
-
-
-def get(pattern: str, **settings):
-    return route(HTTPMethod.GET, pattern, **settings)
-
-
-def put(pattern: str, **settings):
-    return route(HTTPMethod.PUT, pattern, **settings)
-
-
-def action(method: HTTPMethod, prefix: str = '/', suffix: str = '', **settings):
+def autoroute(method: HTTPMethod, prefix: str = '/', suffix: str = '', **settings):
     def decorator(wrapped):
         settings[ATTR_DEPTH] = 1
         pattern = prefix + wrapped.__name__ + suffix
         return _route(method, pattern, settings)(wrapped)
     return decorator
-
-
-def action_get(prefix: str = '/', suffix: str = '', **settings):
-    return action(HTTPMethod.GET, prefix, suffix, **settings)
-
-
-def action_post(prefix: str = '/', suffix: str = '', **settings):
-    return action(HTTPMethod.POST, prefix, suffix, **settings)
-
-
-def action_put(prefix: str = '/', suffix: str = '', **settings):
-    return action(HTTPMethod.PUT, prefix, suffix, **settings)
 
 
 class Api(object):
@@ -99,9 +62,10 @@ class Api(object):
         settings.update(view.__dict__)
         pattern = settings.pop('pattern', None)
         factory = settings.pop('factory', None)
-        route_name = None if pattern is None else view.__qualname__ + '.' + str(pattern.__hash__())
+        method = settings.pop('request_method', HTTPMethod.GET.value)
+        route_name = method + '_' + pattern
         route_name = settings.get('route_name', route_name)
         settings['route_name'] = route_name
         if pattern is not None:
-            config.add_route(route_name, pattern, factory=factory)
+            config.add_route(route_name, pattern, factory=factory, request_method=method)
         config.add_view(self.__class__, **settings)

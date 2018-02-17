@@ -84,8 +84,8 @@ class PermissionSql(Base):
 
     def val(self):
         return Permission(
-            self.subject,
-            self.object,
+            Urn(self.subject),
+            Urn(self.object),
             self.value)
 
 

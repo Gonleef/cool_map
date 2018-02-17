@@ -10,7 +10,7 @@ from pyramid.request import Request
 from pyramid.view import view_config
 
 
-@view_config(route_name='form', renderer='templates/form.jinja2')
+@view_config(route_name='answer', renderer='templates/answer.jinja2')
 class Form(object):
     def __init__(self, context, request: Request):
         self.context = context
@@ -27,7 +27,7 @@ class Form(object):
             return self.delete()
 
     def edit(self):
-        form_id = self.request.matchdict.get('form_id')
+        form_id = self.request.matchdict.get('answer_id')
         form_result = ApiClient(ConfigurationWrapper.get_auth()).form_client.get_form(form_id)
         if not form_result.is_success:
             return {
@@ -44,10 +44,10 @@ class Form(object):
         }
 
     def delete(self):
-        form_id = self.request.matchdict.get('form_id')
+        form_id = self.request.matchdict.get('answer_id')
         result = ApiClient(ConfigurationWrapper.get_auth()).form_client.delete_form(form_id)
         if not result.is_success:
             logging.warning("Fail to delete form '%s': %s" % (form_id, result.data.message))
-        return HTTPTemporaryRedirect('/admin/form')
+        return HTTPTemporaryRedirect('/admin/answer')
 
 

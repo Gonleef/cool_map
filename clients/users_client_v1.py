@@ -18,4 +18,4 @@ class UsersClient(object):
         response = request.get_response()
         data = json.loads(response.body.decode())
         return OperationResult.success(User(**data)) if response.status_code == HTTPStatus.OK \
-            else OperationResult.fail(FailResult(http_code=response.status_code, **data))
+            else OperationResult.fail(FailResult(code=response.status_code, **data))

@@ -1,4 +1,5 @@
 from core.permissions import Permissions
+from core.urn import Urn
 
 
 class SessionState(object):
@@ -16,17 +17,29 @@ class SessionState(object):
         self.ip_address = ip_address
 
 
-class FailResult(object):
+class FailResultSimple(object):
     def __init__(
             self,
             status: str = 'UndefinedError',
-            error_message: str = '',
-            http_code: int = None,
-            **kwargs):
-        self.code = http_code
+            message: str = ''):
         self.status = status
-        self.error_message = error_message
-        self.__dict__.pop('code')
+        self.message = message
+
+    def __str__(self):
+        return self.status + ': ' + self.message
+
+
+class FailResult(FailResultSimple):
+    def __init__(
+            self,
+            status: str = 'UndefinedError',
+            message: str = '',
+            code: int = None):
+        self.code = code
+        super(FailResult, self).__init__(status, message)
+
+    def __str__(self):
+        return self.status + '(' + str(self.code) + '): ' + self.message
 
 
 class ItemsResult(object):
@@ -45,8 +58,8 @@ class ItemsResult(object):
 class Permission(object):
     def __init__(
             self,
-            subject: str,
-            object: str,
+            subject: Urn,
+            object: Urn,
             value: Permissions):
         self.subject = subject
         self.object = object

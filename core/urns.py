@@ -15,6 +15,7 @@ class Urns(object):
     class Admin(object):
         __nid = 'admin'
         Index = Urn(__nid, 'index')
+        Enter = Urn(__nid, 'enter')
         Answers = Urn(__nid, 'answers')
         Form = Urn(__nid, 'form')
         Forms = Urn(__nid, 'forms')

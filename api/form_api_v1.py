@@ -1,6 +1,7 @@
-from api.api import Api, get, default
-from core.entities import ItemsResult, FailResult
+from api.api import Api, default, route
+from core.entities import ItemsResult, FailResultSimple
 from core.entities_sql import create_transaction, AnswerSql, FormSql
+from core.http_method import HTTPMethod
 from core.response import HTTPOk, HTTPNotFound
 from core.urns import Urns
 
@@ -10,17 +11,31 @@ class FormApiV1(Api):
     def __init__(self, *args):
         super(FormApiV1, self).__init__(args)
 
-    @get('form/{form_id}')
+    @route(HTTPMethod.GET, 'form/{form_id}')
     def get_form(self):
+        print(1)
         form_id = self.request.matchdict.get('form_id')
         with create_transaction() as transaction:
             form = transaction.query(FormSql) \
                 .filter(FormSql.id == form_id) \
                 .first()
-            return HTTPOk(form.val()) if form is not None \
-                else HTTPNotFound(FailResult('FormNotFound', 'Форма не найдена'))
+            return HTTPOk(form.val()) if form \
+                else HTTPNotFound(FailResultSimple('FormNotFound', 'Форма не найдена'))
 
-    @get('forms/for/{user_id}')
+    @route(HTTPMethod.DELETE, 'form/{form_id}')
+    def delete_form(self):
+        form_id = self.request.matchdict.get('form_id')
+        with create_transaction() as transaction:
+            deleted = transaction.query(FormSql) \
+                .filter(FormSql.id == form_id) \
+                .delete()
+            transaction.query(AnswerSql) \
+                .filter(AnswerSql.form_id == form_id) \
+                .delete()
+            return HTTPOk() if deleted \
+                else HTTPNotFound(FailResultSimple('FormNotFound', 'Форма не найдена'))
+
+    @route(HTTPMethod.GET, 'forms/for/{user_id}')
     def get_forms(self):
         user_id = self.request.matchdict.get('user_id')
         skip = int(self.request.matchdict.get('skip', 0))
@@ -32,7 +47,7 @@ class FormApiV1(Api):
                 .count()
 
             if count == 0 or skip >= count:
-                return HTTPNotFound(items=[], skip=skip, take=take, count=count)
+                return HTTPNotFound(ItemsResult([], skip, take, count))
 
             answers = transaction.query(FormSql)\
                 .filter(FormSql.creator == user_id)\
@@ -40,7 +55,7 @@ class FormApiV1(Api):
             items = list(map(lambda p: p.val().__dict__, answers))
             return HTTPOk(ItemsResult(items, skip, take, count))
 
-    @get('answers/for/{user_id}')
+    @route(HTTPMethod.GET, 'answers/for/{user_id}')
     def answer(self):
         user_id = self.request.matchdict.get('user_id')
         skip = int(self.request.matchdict.get('skip', 0))
@@ -52,7 +67,7 @@ class FormApiV1(Api):
                 .count()
 
             if count == 0 or skip >= count:
-                return HTTPNotFound(items=[], skip=skip, take=take, count=count)
+                return HTTPNotFound(ItemsResult([], skip, take, count))
 
             answers = transaction.query(AnswerSql)\
                 .filter(AnswerSql.respondent_id == user_id)\

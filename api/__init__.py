@@ -3,15 +3,14 @@ from api.base_api_configuration import not_found_view, forbidden_view, exception
 from api.form_api import FormApi
 from api.permissions_api import PermissionApi
 from api.users_api import UsersApi
-from clients.auth_provider import LoginAuthProvider
 from core.auth_policy import HeaderAuthenticationPolicy, AuthorizationPolicy
-from core.configuration import Configuration
+from core.configuration import ConfigurationWrapper
 from core.permissions import Permissions
 from pyramid.config import Configurator
 
 
 def get_app(global_config, **settings):
-    Configuration.init(**settings)
+    ConfigurationWrapper.init(**settings)
 
     config = Configurator(settings=settings)
     config.include(AuthApi, route_prefix='/auth')
@@ -24,5 +23,5 @@ def get_app(global_config, **settings):
     config.add_exception_view(exception_view)
     config.set_default_permission(Permissions.Auth)
     config.set_authentication_policy(HeaderAuthenticationPolicy())
-    config.set_authorization_policy(AuthorizationPolicy())
+    config.set_authorization_policy(AuthorizationPolicy(ConfigurationWrapper.get_auth()))
     return config.make_wsgi_app()

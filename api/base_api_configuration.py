@@ -1,6 +1,6 @@
 import logging
 
-from core.entities import FailResult
+from core.entities import FailResultSimple
 from core.response import HTTPBadResponse, HTTPForbidden, HTTPInternalServerError
 from pyramid.request import Request
 
@@ -10,7 +10,7 @@ def not_found_view(req: Request):
 
 
 def forbidden_view(req: Request):
-    return HTTPForbidden(FailResult('Forbidden', 'Authorization has been denied for this request'))
+    return HTTPForbidden(FailResultSimple('Forbidden', 'Authorization has been denied for this request'))
 
 
 def exception_view(req: Request):

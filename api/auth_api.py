@@ -1,5 +1,4 @@
 from api.auth_api_v1 import AuthApiV1
-from core.permissions import Permissions
 from pyramid.config import Configurator
 
 

@@ -9,26 +9,31 @@ from core.urn import Urn
 from pyramid.request import Request
 
 
+def prepare_request(request: Request):
+    setattr(request, 'auth_sid', None)
+    setattr(request, 'session', None)
+    setattr(request, 'user', None)
+
+
 class HeaderAuthenticationPolicy(object):
     def effective_principals(self, request: Request):
+        prepare_request(request)
         auth_sid = request.headers.get(HTTPHeaders.AUTHORIZATION.value)
         setattr(request, 'auth_sid', auth_sid)
-        setattr(request, 'session', None)
-        setattr(request, 'user', None)
         return request
 
 
 class CookieAuthenticationPolicy(object):
     def effective_principals(self, request: Request):
+        prepare_request(request)
         auth_sid = request.cookies.get('auth.sid')
         setattr(request, 'auth_sid', auth_sid)
-        setattr(request, 'session', None)
         return request
 
 
 class AuthorizationPolicy(object):
-    def __init__(self):
-        self.client = ApiClient(Configuration.get_auth())
+    def __init__(self, auth: IAuthProvider):
+        self.client = ApiClient(auth)
 
     def permits(self, obj: Urn, request: Request, permission: Permissions):
         if permission is None or permission == permission.Null:

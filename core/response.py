@@ -1,16 +1,25 @@
+import json
 from http import HTTPStatus
+
 from core.http_headers import HTTPHeaders
 from pyramid.response import Response
-import json
 
 
 class HTTPResponse(Response):
     def __init__(self, obj=None, **kwargs):
         Response.__init__(self)
         self.headers[HTTPHeaders.CONTENT_TYPE.value] = 'application/json; charset=utf-8'
-        result = obj.__dict__.copy() if obj is not None else dict()
+        if obj is None:
+            result = dict()
+        elif isinstance(obj, dict):
+            result = obj.copy()
+        elif hasattr(obj, '__dict__'):
+            result = obj.__dict__.copy()
+        else:
+            result = {'data': obj}
         result.update(kwargs)
-        self.body = json.dumps(result).encode()
+        if result:
+            self.body = json.dumps(result).encode()
 
 
 class HTTPForbidden(HTTPResponse):

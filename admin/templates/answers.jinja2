@@ -2,9 +2,17 @@
 {% set page = 'answers' %}
 
 {% block base_main %}
+    {% if error %}
+        <div class="alert alert-danger mb-3" role="alert">{{ error.message }}</div>
+    {% endif %}
+
+    {% if answers %}
+    {% if not answers.items %}
+        <div class="alert alert-success mb-3" role="alert">Вы еще не ответили ни на однин опрос</div>
+    {% endif %}
 
     <div class="row">
-        {% for answer in answers %}
+        {% for answer in answers.items %}
         <div class="col-md-4">
             <div class="card mb-4 box-shadow">
                 <!--img class="card-img-top" data-src=""-->
@@ -18,5 +26,6 @@
         </div>
         {% endfor %}
     </div>
+    {% endif %}
 
 {% endblock %}

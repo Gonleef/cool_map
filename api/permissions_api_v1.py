@@ -1,8 +1,10 @@
-from api.api import Api, get, default
-from core.entities import Permission
+from api.api import Api, default, route
+from core.entities import Permission, ItemsResult
 from core.entities_sql import create_transaction, PermissionSql
+from core.http_method import HTTPMethod
 from core.permissions import Permissions
 from core.response import HTTPOk, HTTPNotFound
+from core.urn import UserUrn, Urn
 from core.urns import Urns
 
 
@@ -11,23 +13,46 @@ class PermissionApiV1(Api):
     def __init__(self, *args):
         super(PermissionApiV1, self).__init__(args)
 
-    @get('/user/{user_id}/object/{object}', permission=Permissions.Auth)
-    def get_user_permission(self):
-        sub = 'user:' + self.request.matchdict.get('user_id')
-        obj = self.request.matchdict.get('object')
+    @route(HTTPMethod.GET, '/subject/{subject}/object/{object}')
+    def get_permission(self):
+        sub = Urn(self.request.matchdict.get('subject'))
+        obj = Urn(self.request.matchdict.get('object'))
         return self._get_permission(sub, obj)
 
-    @get('/object/{object}', permission=Permissions.Auth)
+    @route(HTTPMethod.GET, '/object/{object}')
     def get_my_permission(self):
-        sub = 'user:' + self.request.session.user_id
-        obj = self.request.matchdict.get('object')
+        sub = UserUrn(self.request.session.user_id)
+        obj = Urn(self.request.matchdict.get('object'))
         return self._get_permission(sub, obj)
+
+    @route(HTTPMethod.GET, '/list')
+    def get_my_permissions(self):
+        sub = UserUrn(self.request.session.user_id)
+        skip = int(self.request.params.get('skip', 0))
+        take = int(self.request.params.get('take', 50000))
+        return self._get_permissions(sub, skip, take)
 
     @staticmethod
-    def _get_permission(sub: str, obj: str):
+    def _get_permission(sub: Urn, obj: Urn):
         with create_transaction() as transaction:
             permission = transaction.query(PermissionSql) \
                 .filter((PermissionSql.subject == sub) & (PermissionSql.object == obj))\
                 .first()
             return HTTPOk(permission.val()) if permission is not None \
                 else HTTPNotFound(Permission(sub, obj, Permissions.Null))
+
+    @staticmethod
+    def _get_permissions(sub: Urn, skip: int, take: int):
+        with create_transaction() as transaction:
+            count = transaction.query(PermissionSql) \
+                .filter(PermissionSql.subject == sub) \
+                .count()
+
+            if count == 0 or skip >= count:
+                return HTTPNotFound(ItemsResult([], skip, take, count))
+
+            permissions = transaction.query(PermissionSql)\
+                .filter(PermissionSql.subject == sub)\
+                [skip:take]
+            items = list(map(lambda p: p.val().__dict__, permissions))
+            return HTTPOk(ItemsResult(items, skip, take, count))

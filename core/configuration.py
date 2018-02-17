@@ -1,19 +1,36 @@
-from clients.auth_provider import LoginAuthProvider, IAuthProvider
+from clients.auth_provider import LoginAuthProvider
 
 
 class Configuration(object):
-    _auth: IAuthProvider
-
-    Login: str = ''
-    Password: str = ''
+    _settings: dict = dict()
 
     @classmethod
     def init(cls, **settings):
-        for key in settings:
-            setattr(cls, key, settings.get(key))
+        package = cls._get_package_name()
+        cls._settings[package] = settings
+
+    @classmethod
+    def get(cls):
+        package = cls._get_package_name()
+        return cls._settings.get(package)
+
+    @classmethod
+    def _get_package_name(cls):
+        module = cls.__module__
+        return module[:module.index('.')]
+
+
+class ConfigurationWrapper(Configuration):
+    _auth_providers: dict = dict()
 
     @classmethod
     def get_auth(cls):
-        if not hasattr(cls, '_auth') or cls._auth is None:
-            cls._auth = LoginAuthProvider(cls.Login, cls.Password)
-        return cls._auth
+        package = cls._get_package_name()
+        settings = cls._settings.get(package)
+        return cls._get_or_update(cls._auth_providers, package, lambda: LoginAuthProvider(settings.get('login'), settings.get('password')))
+
+    @classmethod
+    def _get_or_update(cls, cache: dict, key: str, provider):
+        if key not in cache:
+            cache[key] = provider()
+        return cache[key]

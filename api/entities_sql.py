@@ -1,12 +1,13 @@
 import uuid
 
+from core.configuration import Configuration
 from core.entities import *
 from sqlalchemy import create_engine, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.session import Session
 
 Base = declarative_base()
-Engine = create_engine('sqlite:///cool_map.db')
+Engine = create_engine(Configuration.get('api').get('database'))
 
 
 class SessionWrapper(Session):

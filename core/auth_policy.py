@@ -2,7 +2,6 @@ import logging
 
 from clients.api_client import ApiClient
 from clients.auth_provider import IAuthProvider
-from core.configuration import Configuration
 from core.http_headers import HTTPHeaders
 from core.permissions import Permissions
 from core.urn import Urn

@@ -2,11 +2,21 @@
 
 {% block base_main %}
     {% if error %}
-        <div class="alert alert-danger mb-3" role="alert">{{ error.message }}</div>
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     {% endif %}
 
     {% if success %}
-        <div class="alert alert-success mb-3" role="alert">{{ success }}</div>
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            {{ success }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     {% endif %}
 
     {% if form %}
@@ -14,7 +24,6 @@
         <h5>{{ form.title }}</h5>
         <p>{{ form.description }}</p>
 
-        {% if inputs %}
         <form method="post">
             {% for id in inputs %}
                 <div class="col-md-12 mb-3 mt-3">
@@ -23,9 +32,11 @@
                 </div>
             {% endfor %}
 
-            <button type="submit" class="btn btn-primary">Изменить</button>
-            <button type="button" class="btn btn-danger" onclick="location.href='/admin/answer/{{ answer_id }}?delete=true'">Удалить</button>
+            <div class="input-group">
+                <hr>
+                <button type="submit" class="btn btn-sm btn-outline-primary mr-1">Изменить</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="location.href='/admin/answer/{{ answer_id }}?delete=true'">Удалить</button>
+            </div>
         </form>
-        {% endif %}
     {% endif %}
 {% endblock %}

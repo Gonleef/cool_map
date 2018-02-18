@@ -18,17 +18,17 @@ class Form(object):
         self.user = load_user(request)
 
     def __call__(self):
-        if self.request.method == HTTPMethod.GET.value:
-            if self.request.params.get('delete') == 'true':
-                return self.delete()
-
+        if self.request.method == HTTPMethod.POST.value:
             return self.edit()
         elif self.request.method == HTTPMethod.DELETE.value:
             return self.delete()
+        if self.request.params.get('delete') == 'true':
+            return self.delete()
+        return self.get()
 
-    def edit(self):
+    def get(self, success=None):
         form_id = self.request.matchdict.get('form_id')
-        form_result = ApiClient(ConfigurationWrapper.get_auth()).form_client.get_form(form_id)
+        form_result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.get_form(form_id)
         if not form_result.is_success:
             return {
                 'user': self.user,
@@ -36,8 +36,8 @@ class Form(object):
             }
 
         inputs = json.loads(form_result.data.content)
-        print(inputs)
         return {
+            'success': success,
             'user': self.user,
             'form': form_result.data,
             'inputs': inputs
@@ -45,9 +45,23 @@ class Form(object):
 
     def delete(self):
         form_id = self.request.matchdict.get('form_id')
-        result = ApiClient(ConfigurationWrapper.get_auth()).form_client.delete_form(form_id)
+        result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.delete_form(form_id)
         if not result.is_success:
             logging.warning("Fail to delete form '%s': %s" % (form_id, result.data.message))
         return HTTPTemporaryRedirect('/admin/form')
 
-
+    def edit(self):
+        form_id = self.request.matchdict.get('form_id')
+        answer = dict()
+        for id in self.request.params:
+            answer[id] = self.request.params[id]
+        title = answer.pop('title')
+        description = answer.pop('description')
+        content = json.dumps(answer)
+        result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.set_form(form_id, title, description, content)
+        if not result.is_success:
+            return {
+                'user': self.user,
+                'error': result.data
+            }
+        return self.get('Формы поправлена')

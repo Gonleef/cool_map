@@ -27,7 +27,7 @@ class Form(object):
         return self.get()
 
     def get(self, success: str = None):
-        client = ApiClient(ConfigurationWrapper.get_auth())
+        client = ApiClient(ConfigurationWrapper.get_auth('admin'))
         answer_id = self.request.matchdict.get('answer_id')
         answer_result = client.form_client.get_answer(answer_id)
         if not answer_result.is_success:
@@ -44,7 +44,11 @@ class Form(object):
         inputs = json.loads(form_result.data.content)
         answers = json.loads(answer_result.data.answer)
         for input_id in inputs:
-            inputs[input_id]['answer'] = answers.get(input_id)
+            label = inputs[input_id]
+            inputs[input_id] = {
+                'label': label,
+                'answer': answers.get(input_id, '')
+            }
         return {
             'success': success,
             'user': self.user,
@@ -55,7 +59,7 @@ class Form(object):
 
     def delete(self):
         answer_id = self.request.matchdict.get('answer_id')
-        result = ApiClient(ConfigurationWrapper.get_auth()).form_client.delete_answer(answer_id)
+        result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.delete_answer(answer_id)
         if not result.is_success:
             logging.warning("Fail to delete answer '%s': %s" % (answer_id, result.data.message))
         return HTTPTemporaryRedirect('/admin/answer')
@@ -66,7 +70,7 @@ class Form(object):
         for id in self.request.params:
             answer[id] = self.request.params[id]
         answer = json.dumps(answer)
-        result = ApiClient(ConfigurationWrapper.get_auth()).form_client.set_answer(answer_id, answer)
+        result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.set_answer(answer_id, answer)
         if not result.is_success:
             return {
                 'user': self.user,

@@ -1,56 +1,76 @@
 {% extends "base.jinja2" %}
 
+{% block head %}{{ super() }}
+<script>
+function guid() {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+            s4() + '-' + s4() + s4() + s4();
+}
+function add_input() {
+    container = document.getElementById('inputs');
+    id = guid();
+    div = document.createElement('div');
+    div.className = 'input-group alert fade show';
+    div.setAttribute('role', 'alert');
+    div.style = 'padding-top: 0; padding-bottom: 0';
+    div.innerHTML = '\r\n' +
+'                <input type="text" id="' + id + '" name="' + id + '" class="form-control" placeholder="Введите вопрос" style="border-bottom-right-radius: 0; border-top-right-radius: 0;">\r\n' +
+'                <button type="button" class="btn btn-sm btn-outline-danger" data-dismiss="alert" style="border-bottom-left-radius: 0; border-top-left-radius: 0;">&times;</button>';
+    container.appendChild(div)
+}
+</script>
+{% endblock %}
+
 {% block base_main %}
     {% if error %}
-        <div class="alert alert-danger mb-3" role="alert">{{ error.message }}</div>
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    {% if success %}
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            {{ success }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     {% endif %}
 
     {% if form %}
-    <form>
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="title-label">Название</span>
-            </div>
-            <input type="text" class="form-control" value="{{ form.title }}">
+    <form method="post">
+        <div class="input-group">
+            <span class="input-group-text col-sm-2 input-group-prepend" id="title-label" style="border-radius: .25em 0 0 0;">Название</span>
+            <input type="text" id="title" name="title" class="form-control col-sm-10" style="border-radius: 0 .25em 0 0;" value="{{ form.title }}">
         </div>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Описание</span>
-            </div>
-            <textarea class="form-control">{{ form.description }}</textarea>
-        </div><br>
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Контент</span>
-            </div>
-            <textarea class="form-control">{{ form.content }}</textarea>
+        <div class="input-group" style="margin-top: -1px;">
+            <span class="input-group-text col-sm-2 input-group-prepend" style="border-radius: 0 0 0 .25em;">Описание</span>
+            <textarea id="description" name="description" class="form-control col-sm-10" style="border-radius: 0 0 .25em 0;">{{ form.description }}</textarea>
         </div>
 
-        {% if inputs %}
-        <hr>
-        <h5>Вопросы</h5>
-        {% for input in inputs %}
-            <div class="card mb-3">
-
-                <div class="col-md-12 mb-3 mt-3">
-                    <label for="question_{{ input.id }}">Вопрос</label>
-                    <input type="text" class="form-control" id="question_{{ input.id }}" placeholder="Введите вопрос" value="{{ input.label }}">
-                </div>
-
-                <div class="col-md-2 mb-3">
-                    <label for="state">Тип</label>
-                    <select class="custom-select d-block w-100" id="state" required>
-                      <option {{ 'selected' if input.type == 'input' }} value="input">Input</option>
-                    </select>
-                </div>
+        <div id="inputs" class="mt-3">
+            {% for id in inputs %}
+            <div class="input-group alert fade show" role="alert" style="padding-top: 0; padding-bottom: 0">
+                <input type="text" id="{{ id }}" name="{{ id }}" class="form-control" placeholder="Введите вопрос" value="{{ inputs[id] }}" style="border-bottom-right-radius: 0; border-top-right-radius: 0;">
+                <button type="button" class="btn btn-sm btn-outline-danger" data-dismiss="alert" style="border-bottom-left-radius: 0; border-top-left-radius: 0;">&times;</button>
             </div>
+            {% endfor %}
+        </div>
 
-        {% endfor %}
-
-        <button type="button" class="btn btn-primary">Primary</button>
-        <button type="button" class="btn btn-secondary">Secondary</button>
-        <button type="button" class="btn btn-danger">Danger</button>
-        {% endif %}
+        <div class="input-group">
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="add_input()">Добавить вопрос</button>
+            <hr>
+            <button type="submit" class="btn btn-sm btn-outline-primary mr-1">Изменить</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="location.href='/admin/form/{{ form.id }}?delete=true'">Удалить</button>
+        </div>
     {% endif %}
     </form>
 {% endblock %}

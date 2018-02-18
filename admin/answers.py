@@ -14,7 +14,7 @@ class Answers(object):
         self.user = load_user(request)
 
     def __call__(self):
-        client = ApiClient(ConfigurationWrapper.get_auth())
+        client = ApiClient(ConfigurationWrapper.get_auth('admin'))
         skip = int(self.request.params.get('skip', 0))
         take = int(self.request.params.get('take', 50000))
         answer_result = client.form_client.get_answers(self.request.session.user_id, skip, take)

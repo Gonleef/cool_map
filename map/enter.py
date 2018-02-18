@@ -27,7 +27,7 @@ class Enter(object):
         login = self.request.params.get('login', '')
         password = self.request.params.get('password', '')
         remember = self.request.params.get('remember')
-        result = ApiClient(ConfigurationWrapper.get_auth()).auth_client.authenticate_by_pass(login, password, self.request.client_addr)
+        result = ApiClient(ConfigurationWrapper.get_auth('map')).auth_client.authenticate_by_pass(login, password, self.request.client_addr)
         if not result.is_success:
             return {'result': result.data}
 

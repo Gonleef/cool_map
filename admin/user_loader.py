@@ -7,7 +7,7 @@ from pyramid.request import Request
 
 
 def load_user(request: Request) -> User:
-    client = ApiClient(ConfigurationWrapper.get_auth())
+    client = ApiClient(ConfigurationWrapper.get_auth('admin'))
     if hasattr(request, 'session') and request.session is not None:
         result = client.users_client.load(request.session.user_id)
         if not result.is_success:

@@ -58,6 +58,20 @@ class FormClient(object):
         return OperationResult.success(Form(**data)) if response.status_code == HTTPStatus.OK \
             else OperationResult.fail(FailResult(code=response.status_code, **data))
 
+    def set_form(self, id: str, title: str, description: str, content: str):
+        request = Request.blank('/api/form/v1/form/' + id)
+        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        request.method = HTTPMethod.POST.value
+        data = {
+            'title': title,
+            'description': description,
+            'content': content
+        }
+        request.body = json.dumps(data).encode()
+        response = request.get_response()
+        return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
+            else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
+
     def delete_form(self, form_id: str):
         request = Request.blank('/api/form/v1/form/' + form_id)
         request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}

@@ -3,12 +3,17 @@
 
 {% block base_main %}
     {% if error %}
-        <div class="alert alert-danger mb-3" role="alert">{{ error.message }}</div>
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
     {% endif %}
 
     {% if forms %}
     {% if not forms.items %}
-        <div class="alert alert-success mb-3" role="alert">Вы еще не ответили ни на однин опрос</div>
+        <div class="alert alert-success mb-3" role="alert">Вы еще не создали ни одну форму</div>
     {% endif %}
 
     <div class="row">

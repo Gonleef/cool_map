@@ -6,7 +6,7 @@ from pyramid.config import Configurator
 
 
 def get_app(global_config, **settings):
-    ConfigurationWrapper.init(**settings)
+    ConfigurationWrapper.init('admin', **settings)
 
     config = Configurator(settings=settings)
     config.include('pyramid_jinja2')
@@ -22,7 +22,7 @@ def get_app(global_config, **settings):
     config.scan()
     config.set_default_permission(Permissions.Auth)
     config.set_authentication_policy(CookieAuthenticationPolicy())
-    config.set_authorization_policy(AuthorizationPolicy(ConfigurationWrapper.get_auth()))
+    config.set_authorization_policy(AuthorizationPolicy(ConfigurationWrapper.get_auth('admin')))
     """config.add_forbidden_view(lambda r: HTTPTemporaryRedirect('/admin'))"""
     config.add_notfound_view(lambda r: HTTPTemporaryRedirect('/admin'))
     return config.make_wsgi_app()

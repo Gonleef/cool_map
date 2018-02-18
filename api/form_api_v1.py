@@ -1,6 +1,8 @@
+import json
+
 from api.api import Api, default, route
+from api.entities_sql import create_transaction, AnswerSql, FormSql
 from core.entities import ItemsResult, FailResultSimple
-from core.entities_sql import create_transaction, AnswerSql, FormSql
 from core.http_method import HTTPMethod
 from core.response import HTTPOk, HTTPNotFound
 from core.urns import Urns
@@ -33,6 +35,18 @@ class FormApiV1(Api):
                 .delete()
             return HTTPOk() if deleted \
                 else HTTPNotFound(FailResultSimple('FormNotFound', 'Форма не найдена'))
+
+    @route(HTTPMethod.POST, 'form/{id}')
+    def set_form(self):
+        id = self.request.matchdict.get('id')
+        data = self.request.body.decode()
+        data = json.loads(data)
+        with create_transaction() as transaction:
+            patched = transaction.query(FormSql) \
+                .filter(FormSql.id == id) \
+                .update(data)
+            return HTTPOk() if patched \
+                else HTTPNotFound(FailResultSimple('AnswerNotFound', 'Форма не найдена'))
 
     @route(HTTPMethod.GET, 'user/{user_id}/form')
     def get_forms(self):
@@ -79,10 +93,10 @@ class FormApiV1(Api):
         id = self.request.matchdict.get('id')
         answer = self.request.body.decode()
         with create_transaction() as transaction:
-            deleted = transaction.query(AnswerSql) \
+            patched = transaction.query(AnswerSql) \
                 .filter(AnswerSql.id == id) \
                 .update({AnswerSql.answer: answer})
-            return HTTPOk() if deleted \
+            return HTTPOk() if patched \
                 else HTTPNotFound(FailResultSimple('AnswerNotFound', 'Ответ не найдена'))
 
     @route(HTTPMethod.GET, 'user/{user_id}/answer')

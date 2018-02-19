@@ -4,6 +4,7 @@ from clients.api_client import ApiClient
 from core.configuration import ConfigurationWrapper
 from core.http_method import HTTPMethod
 from core.permissions import Permissions
+from core.response import HTTPOkWithRedirect
 from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -36,10 +37,6 @@ class Enter(object):
 
     def redirect(self, response_wrapper=lambda r: None):
         back_url = self.request.params.get('back_url', '/')
-
-        response = Response()
-        response.status = HTTPStatus.OK
-        response.location = back_url
+        response = HTTPOkWithRedirect(back_url)
         response_wrapper(response)
-        response.body = ('<script>location.href = "' + back_url + '"</script>').encode()
         return response

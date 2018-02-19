@@ -5,13 +5,13 @@ from admin.user_loader import load_user
 from clients.api_client import ApiClient
 from core.configuration import ConfigurationWrapper
 from core.http_method import HTTPMethod
-from core.response import HTTPTemporaryRedirect
+from core.response import HTTPTemporaryRedirect, HTTPOkWithRedirect
 from pyramid.request import Request
 from pyramid.view import view_config
 
 
 @view_config(route_name='answer', renderer='templates/answer.jinja2')
-class Form(object):
+class AnswerPage(object):
     def __init__(self, context, request: Request):
         self.context = context
         self.request = request
@@ -62,7 +62,7 @@ class Form(object):
         result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.delete_answer(answer_id)
         if not result.is_success:
             logging.warning("Fail to delete answer '%s': %s" % (answer_id, result.data.message))
-        return HTTPTemporaryRedirect('/admin/answer')
+        return HTTPOkWithRedirect('/admin/answer/')
 
     def edit(self):
         answer_id = self.request.matchdict.get('answer_id')
@@ -76,4 +76,4 @@ class Form(object):
                 'user': self.user,
                 'error': result.data
             }
-        return self.get('Новый ответ записан')
+        return self.get('Ответ записан')

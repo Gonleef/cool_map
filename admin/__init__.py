@@ -17,6 +17,7 @@ def get_app(global_config, **settings):
     config.add_route('answer', '/answer/{answer_id}')
     config.add_route('forms', '/form')
     config.add_route('form', '/form/{form_id}')
+    config.add_route('bindings', '/form/{form_id}/bindings')
     config.add_route('user', '/user')
     config.add_route('user_permissions', '/permissions')
     config.scan()

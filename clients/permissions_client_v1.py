@@ -15,17 +15,17 @@ class PermissionClient(object):
 
     def get_permissions(self, skip: int = 0, take: int = 50000):
         request = Request.blank('/api/permissions/v1/list?skip=%s&take=%s' % (skip, take))
-        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        request.authorization = self.auth.get_session_id()
         return self._get_permissions(request)
 
     def get_permission(self, obj: str):
         request = Request.blank('/api/permissions/v1/object/%s' % obj)
-        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        request.authorization = self.auth.get_session_id()
         return self._get_permission(request, ' to object ' + obj)
 
     def get_user_permission(self, user_id: str, obj: str):
         request = Request.blank('/api/permissions/v1/user/%s/object/%s' % (user_id, obj))
-        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        request.authorization = self.auth.get_session_id()
         return self._get_permission(request, ' for user %s to object %s' % (user_id, obj))
 
     @staticmethod

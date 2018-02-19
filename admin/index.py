@@ -4,7 +4,7 @@ from pyramid.view import view_config
 
 
 @view_config(route_name='index', renderer='templates/index.jinja2')
-class Index(object):
+class IndexPage(object):
     def __init__(self, context, request: Request):
         self.context = context
         self.request = request

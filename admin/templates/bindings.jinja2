@@ -1,0 +1,115 @@
+{% extends "base.jinja2" %}
+
+{% block head %}{{ super() }}
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.4.2/css/ol.css" type="text/css"/>
+    <script src="https://openlayers.org/en/v4.4.2/build/ol.js"></script>
+{% endblock %}
+
+{% block base_main %}
+    {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    <div id="map"></div>
+    <div id="popup"></div>
+
+    {% if places %}
+    {% if not places.items %}
+        <div class="alert alert-success mb-3" role="alert">Данная форма еще никуда не привязана</div>
+    {% endif %}
+
+    <div class="row">
+        {% for place in places.items %}
+            <div class="alert alert-dismissible fade show mt-3" role="alert" onclick="map..setCenter(ol.proj.transform([ -0.1279688 ,51.5077286 ], 'EPSG:3857', 'EPSG:4326'), 14);">
+                {{ place.title }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <script>
+function add_marker(id, coordinate) {
+    var geom = new ol.geom.Point( ol.proj.fromLonLat(coordinate) );
+    var feature = new ol.Feature(geom);
+    feature.setStyle([
+        new ol.style.Style({
+            image: new ol.style.Icon(({
+                color: '#8959A8',
+                crossOrigin: 'anonymous',
+                src: 'https://openlayers.org/en/v4.6.4/examples/data/dot.png'
+            }))
+        })
+    ]);
+
+    feature.setId(id);
+    map.getLayers().item(1).getSource().addFeature(feature);
+}
+function delete_marker(id)
+{
+  var id = map.getLayers().item(1).getSource().getFeatureById(id);
+  map.getLayers().item(1).getSource().removeFeature(id);
+}
+
+var markerLayer = new ol.layer.Vector({
+    source: new ol.source.Vector({ features: [], projection: 'EPSG:4326' })
+});
+
+var baseLayer = new ol.layer.Tile( {
+    source: new ol.source.OSM()
+});
+
+map = new ol.Map({
+    target: 'map',
+    renderer: 'canvas',
+    layers: [ baseLayer, markerLayer ],
+    view: new ol.View({
+        center:  ol.proj.fromLonLat([60.61, 56.82]),
+        zoom: 13
+    })
+});
+add_marker('123', [60.61, 56.82]);
+
+var element = document.getElementById('popup');
+var popup = new ol.Overlay({
+    element: element,
+    positioning: 'bottom-center',
+    stopEvent: false,
+});
+map.addOverlay(popup);
+
+      // display popup on click
+map.on('click', function(evt) {
+var feature = map.forEachFeatureAtPixel(evt.pixel,
+function(feature) {
+    return feature;
+});
+if (feature) {
+  var coordinates = feature.getGeometry().getCoordinates();
+  popup.setPosition(coordinates);
+  $(element).popover({
+    'placement': 'top',
+    'html': true,
+    'content': 'as;dl;alsd'
+  });
+  $(element).popover('show');
+} else {
+  $(element).popover('destroy');
+}
+});
+
+      // change mouse cursor when over marker
+map.on('pointermove', function(e) {
+$(element).popover('destroy');
+    var pixel = map.getEventPixel(e.originalEvent);
+    var hit = map.hasFeatureAtPixel(pixel);
+});
+  </script>
+{% endblock %}

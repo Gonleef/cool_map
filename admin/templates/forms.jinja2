@@ -11,6 +11,10 @@
         </div>
     {% endif %}
 
+    <div class="alert alert-light" role="alert">
+        Для создания новой формы нажмите <a class="alert-link" href="/admin/form/{{ random_uuid }}?create=true">сюда</a>.
+    </div>
+
     {% if forms %}
     {% if not forms.items %}
         <div class="alert alert-success mb-3" role="alert">Вы еще не создали ни одну форму</div>
@@ -21,11 +25,17 @@
         <div class="col-md-4">
             <div class="card mb-4 box-shadow">
                 <div class="card-body">
-                    <h5 class="card-title">{{ form.title }}</h5>
-                    <p class="card-text">{{ form.description }}</p>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href='/admin/form/{{ form.id }}'">
-                        Редактировать</button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="location.href='/admin/form/{{ form.id }}?delete=true'">Удалить</button>
+                    <h5 class="card-title">{{ form.title | default(form.id) | e }}</h5>
+                    <p class="card-text">{{ form.description | e | truncate(100) }}</p>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary float-left border-0" onclick="location.href='/admin/form/{{ form.id }}'">
+                            Редактировать
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-primary float-left border-0" onclick="location.href='/admin/form/{{ form.id }}/bindings'">
+                            Привязки
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger float-right border-0" onclick="location.href='/admin/form/{{ form.id }}?delete=true'">Удалить</button>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,11 +1,12 @@
 import json
 
 from api.api import Api, default, route
-from api.entities_sql import create_transaction, AnswerSql, FormSql
+from api.entities_sql import create_transaction, AnswerSql, FormSql, BindingSql, PlaceSql
 from core.entities import ItemsResult, FailResultSimple
 from core.http_method import HTTPMethod
 from core.response import HTTPOk, HTTPNotFound
 from core.urns import Urns
+from sqlalchemy.exc import IntegrityError
 
 
 @default(factory=lambda r: Urns.Api.Forms)
@@ -46,7 +47,20 @@ class FormApiV1(Api):
                 .filter(FormSql.id == id) \
                 .update(data)
             return HTTPOk() if patched \
-                else HTTPNotFound(FailResultSimple('AnswerNotFound', 'Форма не найдена'))
+                else HTTPNotFound(FailResultSimple('FormNotFound', 'Форма не найдена'))
+
+    @route(HTTPMethod.PUT, 'form/{id}')
+    def put_form(self):
+        id = self.request.matchdict.get('id')
+        data = self.request.body.decode()
+        data = json.loads(data)
+        form = FormSql(id=id, **data)
+        try:
+            with create_transaction() as transaction:
+                transaction.add(form)
+            return HTTPOk()
+        except IntegrityError:
+            return HTTPNotFound(FailResultSimple('FormNotCreated', 'Форма не создана'))
 
     @route(HTTPMethod.GET, 'user/{user_id}/form')
     def get_forms(self):
@@ -106,15 +120,34 @@ class FormApiV1(Api):
         take = int(self.request.matchdict.get('take', 50000))
 
         with create_transaction() as transaction:
-            count = transaction.query(AnswerSql)\
-                .filter(AnswerSql.respondent_id == user_id)\
+            count = transaction.query(AnswerSql) \
+                .filter(AnswerSql.respondent_id == user_id) \
                 .count()
 
             if count == 0 or skip >= count:
                 return HTTPNotFound(ItemsResult([], skip, take, count))
 
-            answers = transaction.query(AnswerSql)\
-                .filter(AnswerSql.respondent_id == user_id)\
+            answers = transaction.query(AnswerSql) \
+                          .filter(AnswerSql.respondent_id == user_id) \
+                [skip:take]
+            items = list(map(lambda p: p.val().__dict__, answers))
+            return HTTPOk(ItemsResult(items, skip, take, count))
+
+    @route(HTTPMethod.GET, 'form/{form_id}/bindings')
+    def get_answers(self):
+        form_id = self.request.matchdict.get('form_id')
+        skip = int(self.request.matchdict.get('skip', 0))
+        take = int(self.request.matchdict.get('take', 50000))
+        with create_transaction() as transaction:
+            count = transaction.query(BindingSql)\
+                .join(PlaceSql, BindingSql.place_id == PlaceSql.id) \
+                .filter(BindingSql.form_id == form_id) \
+                .count()
+            if count == 0 or skip >= count:
+                return HTTPNotFound(ItemsResult([], skip, take, count))
+            answers = transaction.query(PlaceSql) \
+                .join(BindingSql, BindingSql.place_id == PlaceSql.id) \
+                .filter(BindingSql.form_id == form_id) \
                 [skip:take]
             items = list(map(lambda p: p.val().__dict__, answers))
             return HTTPOk(ItemsResult(items, skip, take, count))

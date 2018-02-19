@@ -22,10 +22,12 @@
             <div class="card mb-4 box-shadow">
                 <!--img class="card-img-top" data-src=""-->
                 <div class="card-body">
-                    <h5 class="card-title">{{ answer.form_info.title }}</h5>
-                    <p class="card-text">{{ answer.form_info.description }}</p>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="location.href='/admin/answer/{{ answer.id }}'">Редактировать</button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="location.href='/admin/answer/{{ answer.id }}?delete=true'">Удалить</button>
+                    <h5 class="card-title">{{ answer.form_info.title | default(answer.id) | e }}</h5>
+                    <p class="card-text">{{ answer.form_info.description | e | truncate(100) }}</p>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary border-0 float-left" onclick="location.href='/admin/answer/{{ answer.id }}'">Редактировать</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 float-right" onclick="location.href='/admin/answer/{{ answer.id }}?delete=true'">Удалить</button>
+                    </div>
                 </div>
             </div>
         </div>

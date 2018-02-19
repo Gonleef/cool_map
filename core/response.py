@@ -57,3 +57,11 @@ class HTTPNotFound(HTTPResponse):
     def __init__(self, obj=None, **kwargs):
         HTTPResponse.__init__(self, obj, **kwargs)
         self.status = HTTPStatus.NOT_FOUND
+
+
+class HTTPOkWithRedirect(HTTPResponse):
+    def __init__(self, ref: str):
+        Response.__init__(self)
+        self.status = HTTPStatus.OK
+        self.location = ref
+        self.body = ('<script>location.href = "' + ref + '"</script>').encode()

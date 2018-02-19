@@ -14,7 +14,7 @@ class UsersClient(object):
 
     def load(self, user_id: str):
         request = Request.blank('api/users/v1/user/' + user_id)
-        request.headers = {HTTPHeaders.AUTHORIZATION.value: self.auth.get_session_id()}
+        request.authorization = self.auth.get_session_id()
         response = request.get_response()
         data = json.loads(response.body.decode())
         return OperationResult.success(User(**data)) if response.status_code == HTTPStatus.OK \

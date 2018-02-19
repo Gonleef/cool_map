@@ -36,7 +36,7 @@ $(document).ready(function() {
             source: new ol.source.OSM()
           })
         ],
-				overlays: [overlay],
+        overlays: [overlay],
         target: 'map',
         view: new ol.View({
           center: ol.proj.fromLonLat([60.61, 56.82]),
@@ -48,26 +48,27 @@ $(document).ready(function() {
       /**
        * Add a click handler to the map to render the popup.
        */
-      map.on('singleclick', function(evt) {
+      map.on('click', function(evt) {
         var coordinate = evt.coordinate;
-				var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326').toString();
-				var lat = data.substring(data.indexOf(",") + 1,data.length);
-				var lon = data.substring(0, data.indexOf(","));
-        content.innerHTML =
+        var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
+        var lon = data.substring(data[0]);
+        var lat = data.substring(data[1]);
+        $.get("http://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon=" + lon + "&addressdetails=1", function(data) {
+            console.log(data);
+        });
+		content.innerHTML =
 				'<input type="hidden" name="lon" value="'+lon+'"/>' +
 				'<input type="hidden" name="lat" value="'+lat+'"/>' +
 				'<button id="send">Написать отзыв</button>';
         overlay.setPosition(coordinate);
-   $("#send").click(function(){
-	  	var coordinate = evt.coordinate;
-		var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326').toString();
-		var lat = data.substring(data.indexOf(",") + 1,data.length);
-		var lon = data.substring(0, data.indexOf(","));
-		$.get("http://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon=" + lon + "&addressdetails=1", function(data) {
-			console.log(data);
-		});
+       $("#send").click(function(){
+            var coordinate = evt.coordinate;
+            var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326').toString();
+            var lat = data.substring(data.indexOf(",") + 1,data.length);
+            var lon = data.substring(0, data.indexOf(","));
 
-	  });
+
+          });
       });
 
 

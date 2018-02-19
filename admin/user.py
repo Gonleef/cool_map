@@ -4,7 +4,7 @@ from pyramid.view import view_config
 
 
 @view_config(route_name='user', renderer='templates/user.jinja2')
-class User(object):
+class UserPage(object):
     def __init__(self, context, request: Request):
         self.request = request
         self.context = context

@@ -95,3 +95,18 @@ class User(object):
         self.id = id
         self.login = login
         self.email = email
+
+
+class Binding(object):
+    def __init__(self, form_id: str, place_id: str):
+        self.form_id = form_id
+        self.place_id = place_id
+
+
+class Place(object):
+    def __init__(self, id: str, osm_type: str, osm_id: int, title: str, address: str):
+        self.id = id
+        self.osm_type = osm_type
+        self.osm_id = osm_id
+        self.title = title
+        self.address = address

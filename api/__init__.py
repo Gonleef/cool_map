@@ -13,6 +13,7 @@ def get_app(global_config, **settings):
     config.include('api.users_api', route_prefix='/users')
     config.include('api.permissions_api', route_prefix='/permissions')
     config.include('api.form_api', route_prefix='/form')
+    config.include('api.places_api', route_prefix='/places')
     config.add_notfound_view(not_found_view)
     config.add_forbidden_view(forbidden_view)
     config.add_exception_view(exception_view)

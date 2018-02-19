@@ -21,13 +21,13 @@
 
     {% if form %}
     <p>
-        <h5>{{ form.title }}</h5>
-        <p>{{ form.description }}</p>
+        <h5>{{ form.title | e}}</h5>
+        <p>{{ form.description | e }}</p>
 
         <form method="post">
             {% for id in inputs %}
                 <div class="col-md-12 mb-3 mt-3">
-                    <label for="{{ id }}">{{ inputs[id].label }}</label>
+                    <label for="{{ id }}">{{ inputs[id].label | e }}</label>
                     <input type="text" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="Введите ответ" value="{{ inputs[id].answer }}">
                 </div>
             {% endfor %}

@@ -7,7 +7,7 @@ from pyramid.view import view_config
 
 
 @view_config(route_name='answers', renderer='templates/answers.jinja2')
-class Answers(object):
+class AnswersPage(object):
     def __init__(self, context, request: Request):
         self.context = context
         self.request = request

@@ -1,3 +1,5 @@
+import uuid
+
 from admin.user_loader import load_user
 from clients.api_client import ApiClient
 from core.configuration import ConfigurationWrapper
@@ -6,7 +8,7 @@ from pyramid.view import view_config
 
 
 @view_config(route_name='forms', renderer='templates/forms.jinja2')
-class Forms(object):
+class FormsPage(object):
     def __init__(self, context, request: Request):
         self.request = request
         self.context = context
@@ -25,5 +27,6 @@ class Forms(object):
 
         return {
             'user': self.user,
-            'forms': forms_result.data
+            'forms': forms_result.data,
+            'random_uuid': str(uuid.uuid4())
         }

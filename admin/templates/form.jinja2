@@ -59,7 +59,7 @@ function add_input() {
         <div id="inputs" class="mt-3">
             {% for id in inputs %}
             <div class="input-group alert fade show" role="alert" style="padding-top: 0; padding-bottom: 0">
-                <input type="text" id="{{ id }}" name="{{ id }}" class="form-control" placeholder="Введите вопрос" value="{{ inputs[id] }}" style="border-bottom-right-radius: 0; border-top-right-radius: 0;">
+                <input type="text" id="{{ id }}" name="{{ id }}" class="form-control" placeholder="Введите вопрос" value="{{ inputs[id]  }}" style="border-bottom-right-radius: 0; border-top-right-radius: 0;">
                 <button type="button" class="btn btn-sm btn-outline-danger" data-dismiss="alert" style="border-bottom-left-radius: 0; border-top-left-radius: 0;">&times;</button>
             </div>
             {% endfor %}

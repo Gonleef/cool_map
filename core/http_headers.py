@@ -6,3 +6,4 @@ class HTTPHeaders(Enum):
     LOCATION = 'Location'
     AUTHORIZATION = 'Authorization'
     SET_COOKIE = 'Set-Cookie'
+    USER_AGENT = 'User-Agent'

@@ -7,7 +7,7 @@ from pyramid.request import Request
 from pyramid.view import view_config
 
 
-@view_config(route_name='bindings', renderer='templates/bindings.jinja2')
+@view_config(route_name='places', renderer='templates/places.jinja2')
 class PlacesPage(object):
     def __init__(self, context, request: Request):
         self.request = request
@@ -28,6 +28,7 @@ class PlacesPage(object):
 
         return {
             'user': self.user,
+            'form_id': form_id,
             'places': bindings_result.data,
             'random_uuid': str(uuid.uuid4())
         }

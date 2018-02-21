@@ -1,0 +1,65 @@
+{% extends "base.jinja2" %}
+
+{% block head %}{{ super() }}
+    <style>
+.form-control {
+    position: relative;
+}
+.form-control:focus {
+    z-index: 2;
+}
+    </style>
+{% endblock %}
+
+{% block base_main %}
+<section>
+    <h4 class="mb-3">Аккаунт</h4>
+    <form class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="username">Login</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">@</span>
+                </div>
+                <input type="text" class="form-control" id="username" placeholder="Username" required value="{{ user.login }}">
+                <div class="invalid-feedback" style="width: 100%;">
+                    Your username is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="email">Email <span class="text-muted">(Optional)</span></label>
+            <input type="email" class="form-control" id="email" placeholder="you@example.com" value="{{ user.email if user.email }}">
+            <div class="invalid-feedback">
+                Please enter a valid email address for shipping updates.
+            </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Сохранить</button>
+    </form>
+</section>
+<hr>
+<section>
+    <h4 class="mb-3">Смена пароля</h4>
+    <form class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="old_password">Старый пароль</label>
+            <input type="text" class="form-control" id="old_password" placeholder="Old password" required>
+            <div class="invalid-feedback">
+                Please enter a old password.
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="new_password">Новый пароль</label>
+            <input type="text" class="form-control" id="new_password1" placeholder="New password" required style="border-bottom-left-radius: 0; border-bottom-right-radius: 0">
+            <input type="text" class="form-control" id="new_password2" placeholder="New password" required style="border-top-left-radius: 0; border-top-right-radius: 0; border-top: 0">
+            <div class="invalid-feedback">
+                Please enter a new password.
+            </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Сменить</button>
+    </form>
+</section>
+{% endblock %}

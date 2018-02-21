@@ -1,0 +1,129 @@
+{% extends "base.jinja2" %}
+
+{% block head %}{{ super() }}
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.4.2/css/ol.css" type="text/css"/>
+    <script src="https://openlayers.org/en/v4.4.2/build/ol.js"></script>
+{% endblock %}
+
+{% block base_main %}
+    {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    {% if form_id %}
+    <div class="row">
+        <div class="col-sm-4" >
+            <div>
+                <h5>Координаты</h5>
+                <div class="input-group">
+                    <span class="input-group-text col-sm-3 input-group-prepend" style="border-radius: .25em 0 0 0;">Широта</span>
+                    <input type="text" id="lat" name="lat" class="form-control col-sm-9" style="border-radius: 0 .25em 0 0;">
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text col-sm-3 input-group-prepend" style="border-radius: 0 0 0 .25em; border-top: 0">Долгота</span>
+                    <input type="text" id="lon" name="lon" class="form-control col-sm-9" style="border-radius: 0 0 .25em 0; border-top: 0">
+                </div>
+
+                <button class="btn btn-primary btn-lg btn-block mt-3 disabled" disabled type="submit" id="create">Создать</button>
+            </div>
+            <hr>
+            <div id="info"></div>
+        </div>
+        <div class="rounded border col-sm-8 pl-0 pr-0 border-dark" id="map"></div>
+    </div>
+    {% endif %}
+
+    <script>
+var markerLayer = new ol.layer.Vector({
+    source: new ol.source.Vector({ features: [], projection: 'EPSG:4326' })
+});
+
+var baseLayer = new ol.layer.Tile( {
+    source: new ol.source.OSM()
+});
+
+var map = new ol.Map({
+    layers: [baseLayer, markerLayer],
+    target: 'map',
+    view: new ol.View({
+        center: [0, 0],
+        zoom: 2
+    })
+});
+
+function add_marker(id, coordinate) {
+    var geom = new ol.geom.Point( ol.proj.fromLonLat(coordinate) );
+    var feature = new ol.Feature(geom);
+    feature.setStyle([
+        new ol.style.Style({
+            image: new ol.style.Icon(({
+                color: '#8959A8',
+                crossOrigin: 'anonymous',
+                src: 'https://openlayers.org/en/v4.6.4/examples/data/dot.png'
+            }))
+        })
+    ]);
+
+    feature.setId(id);
+    map.getLayers().item(1).getSource().addFeature(feature);
+}
+
+function delete_marker(id)
+{
+  var feature = map.getLayers().item(1).getSource().getFeatureById(id);
+  if (feature)
+    map.getLayers().item(1).getSource().removeFeature(feature);
+}
+
+function load_info(coordinate) {
+    var button = document.getElementById('create');
+    var info = document.getElementById('info');
+    var xhr = new XMLHttpRequest();
+    info.innerHTML = 'Загрузка...';
+    button.onclick = function () {};
+    button.disabled = true;
+    button.classList.add('disabled');
+    xhr.open('GET', '/api/place/v1/geodecoding?lon=' + coordinate[0] + '&lat=' + coordinate[1] , true);
+    xhr.send();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== 4) return;
+        if (xhr.status === 200) {
+            var data = JSON.parse(xhr.response.toString());
+            info.innerHTML = data.title;
+            button.disabled = false;
+            button.classList.remove('disabled');
+            button.onclick = function () {
+                location.href = '/admin/form/{{ form_id }}/place/' + data.id + '?create=true';
+            }
+        }
+    }
+}
+
+navigator.geolocation.getCurrentPosition(function(position) {
+    var lat = position.coords.latitude;
+    var lon = position.coords.longitude;
+    document.getElementById('lat').value = lat;
+    document.getElementById('lon').value = lon;
+    map.getView().setCenter(ol.proj.fromLonLat([lon, lat]));
+    map.getView().setZoom(14);
+    delete_marker('marker');
+    add_marker('marker', [lon, lat]);
+    load_info([lon, lat])
+});
+
+map.on('click', function (evt) {
+    var coordinate = evt.coordinate;
+    var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
+    document.getElementById('lat').value = data[0];
+    document.getElementById('lon').value = data[1];
+    delete_marker('marker');
+    add_marker('marker', data)
+    load_info(data)
+})
+    </script>
+{% endblock %}

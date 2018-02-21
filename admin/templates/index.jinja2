@@ -1,33 +1,4 @@
-{% extends "core:templates/base.jinja2" %}
+{% extends "base.jinja2" %}
+{% set page = 'index' %}
 
-{% block head %}{{ super() }}
-    <link rel="stylesheet" href="{{request.static_url('admin:static/header.css')}}">
-{% endblock %}
-
-{% block body %}
-    <header class="header">
-        <section>
-            тут заголовок + профиль
-        </section>
-    </header>
-
-    <main>
-        <section>
-            Тут ответы<br>
-            {% if answer %}
-                {% for answer in answer %}
-                    {{ answer.form_id }}{{ answer.form_info.title }}:{{ answer.form_info.description }}<br>
-                {% endfor %}
-            {% endif %}
-
-            Тут формы<br>
-            {% if forms %}
-                {% for form in forms %}
-                    {{ form.id }}{{ form.title }}:{{ form.description }}<br>
-                {% endfor %}
-            {% endif %}
-        </section>
-
-        созданные формы
-    </main>
-{% endblock body %}
+{% block base_main %}{% endblock %}

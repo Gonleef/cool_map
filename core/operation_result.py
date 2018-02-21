@@ -7,6 +7,6 @@ class OperationResult(object):
     def fail(data):
         return OperationResult(False, data)
 
-    def __init__(self, success, data):
+    def __init__(self, success: bool, data):
         self.is_success = success
         self.data = data

@@ -1,0 +1,38 @@
+{% extends "base.jinja2" %}
+{% set page = 'answers' %}
+
+{% block base_main %}
+    {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    {% if answers %}
+    {% if not answers.items %}
+        <div class="alert alert-success mb-3" role="alert">Вы еще не ответили ни на однин опрос</div>
+    {% endif %}
+
+    <div class="row">
+        {% for answer in answers.items %}
+        <div class="col-md-4">
+            <div class="card mb-4 box-shadow">
+                <!--img class="card-img-top" data-src=""-->
+                <div class="card-body">
+                    <h5 class="card-title">{{ answer.form_info.title | default(answer.id) | e }}</h5>
+                    <p class="card-text">{{ answer.form_info.description | e | truncate(100) }}</p>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-outline-primary border-0 float-left" onclick="location.href='/admin/answer/{{ answer.id }}'">Редактировать</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger border-0 float-right" onclick="location.href='/admin/answer/{{ answer.id }}?delete=true'">Удалить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+{% endblock %}

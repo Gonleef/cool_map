@@ -1,0 +1,32 @@
+{% extends "base.jinja2" %}
+
+{% block base_main %}
+    {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    <div class="alert alert-light" role="alert">
+        Для создания новой привзки нажмите <a class="alert-link" href="/admin/form/{{ form_id }}/place/add">сюда</a>.
+    </div>
+
+    {% if places %}
+    {% if not places.items %}
+        <div class="alert alert-success mb-3" role="alert">Данная форма еще никуда не привязана</div>
+    {% endif %}
+
+    {% for place in places.items %}
+        <div class="card box-shadow">
+            <div class="card-body">
+                {{ place.title | default(place.id) | e }}
+                <button type="button" class="btn btn-sm btn-outline-danger float-right border-0" onclick="location.href='/admin/form/{{ form_id }}/place/{{ place.id }}?delete=true'">Удалить</button>
+                <!--button type="button" class="btn btn-sm btn-outline-primary float-right border-0 mr-1" onclick="location.href='/admin/place/{{ place.id }}'">Смотреть</button-->
+            </div>
+        </div>
+    {% endfor %}
+    {% endif %}
+{% endblock %}

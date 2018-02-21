@@ -1,12 +1,13 @@
 import uuid
 
+from core.configuration import ConfigurationWrapper
 from core.entities import *
 from sqlalchemy import create_engine, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.session import Session
 
 Base = declarative_base()
-Engine = create_engine('sqlite:///cool_map.db')
+Engine = create_engine(ConfigurationWrapper.instance('api').get('database'))
 
 
 class SessionWrapper(Session):
@@ -35,11 +36,17 @@ class UserSql(Base):
     password = __table__.c.Password
     email = __table__.c.Email
 
-    def __init__(self, login: str, password: str, email: str = None):
-        self.id = str(uuid.uuid4())
+    def __init__(self, login: str, password: str, email: str = None, id: str = None):
+        self.id = id if id is not None else str(uuid.uuid4())
         self.login = login
         self.password = password
         self.email = email
+
+    def val(self):
+        return User(
+            self.id,
+            self.login,
+            self.email)
 
 
 class SessionStateSql(Base):
@@ -78,8 +85,8 @@ class PermissionSql(Base):
 
     def val(self):
         return Permission(
-            self.subject,
-            self.object,
+            Urn(self.subject),
+            Urn(self.object),
             self.value)
 
 
@@ -91,8 +98,8 @@ class FormSql(Base):
     description = __table__.c.Description
     content = __table__.c.Content
 
-    def __init__(self, creator: str, title: str, content: str, description: str = None):
-        self.id = str(uuid.uuid4())
+    def __init__(self, creator: str, title: str, content: str, description: str = None, id: str = None):
+        self.id = id if id is not None else str(uuid.uuid4())
         self.creator = creator
         self.title = title
         self.content = content
@@ -109,17 +116,62 @@ class FormSql(Base):
 
 class AnswerSql(Base):
     __table__ = Table('Answer', Base.metadata, autoload=True, autoload_with=Engine)
+    id = __table__.c.Id
     respondent_id = __table__.c.RespondentId
     form_id = __table__.c.FormId
+    place_id = __table__.c.PlaceId
     answer = __table__.c.Answer
 
-    def __init__(self, respondent_id: str, form_id: str, answer: str):
+    def __init__(self, respondent_id: str, form_id: str, place_id: str, answer: str, id: str = None):
+        self.id = id if id is not None else str(uuid.uuid4())
         self.respondent_id = respondent_id
         self.form_id = form_id
+        self.place_id = place_id
         self.answer = answer
 
     def val(self):
         return Answer(
+            self.id,
             self.respondent_id,
             self.form_id,
+            self.place_id,
             self.answer)
+
+
+class BindingSql(Base):
+    __table__ = Table('Binding', Base.metadata, autoload=True, autoload_with=Engine)
+    form_id = __table__.c.FormId
+    place_id = __table__.c.PlaceId
+
+    def __init__(self, form_id: str, place_id: str):
+        self.form_id = form_id
+        self.place_id = place_id
+
+    def val(self):
+        return Binding(
+            self.form_id,
+            self.place_id)
+
+
+class PlaceSql(Base):
+    __table__ = Table('Place', Base.metadata, autoload=True, autoload_with=Engine)
+    id = __table__.c.Id
+    osm_type = __table__.c.Osm_type
+    osm_id = __table__.c.Osm_id
+    title = __table__.c.Title
+    address = __table__.c.Address
+
+    def __init__(self, osm_type: str, osm_id: int, title: str, address: str, id: str = None):
+        self.id = id if id is not None else str(uuid.uuid4())
+        self.osm_type = osm_type
+        self.osm_id = osm_id
+        self.title = title
+        self.address = address
+
+    def val(self):
+        return Place(
+            self.id,
+            self.osm_type,
+            self.osm_id,
+            self.title,
+            self.address)

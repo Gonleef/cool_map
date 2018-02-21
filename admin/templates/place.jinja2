@@ -1,0 +1,27 @@
+{% extends "base.jinja2" %}
+
+{% block base_main %}
+    {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            {{ error.message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    {% if success %}
+        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
+            {{ success }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    {% if place %}
+    <form method="post">
+        {{ place.id }}
+    </form>
+    {% endif %}
+{% endblock %}

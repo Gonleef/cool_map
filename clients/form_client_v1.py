@@ -116,3 +116,19 @@ class FormClient(object):
             return OperationResult.fail(FailResult(code=response.status_code, **data))
         data['items'] = list(map(lambda o: Place(**o), data.get('items', [])))
         return OperationResult.success(ItemsResult(**data))
+
+    def delete_binding(self, form_id: str, place_id: str):
+        request = Request.blank('/api/form/v1/form/%s/place/%s' % (form_id, place_id))
+        request.authorization = self.auth.get_session_id()
+        request.method = HTTPMethod.DELETE.value
+        response = request.get_response()
+        return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
+            else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
+
+    def create_binding(self, form_id: str, place_id: str):
+        request = Request.blank('/api/form/v1/form/%s/place/%s' % (form_id, place_id))
+        request.authorization = self.auth.get_session_id()
+        request.method = HTTPMethod.PUT.value
+        response = request.get_response()
+        return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
+            else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))

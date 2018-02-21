@@ -25,6 +25,13 @@ class PermissionApiV1(Api):
         obj = Urn(self.request.matchdict.get('object'))
         return self._get_permission(sub, obj)
 
+    @route(HTTPMethod.GET, '/subject/{subject}/list')
+    def get_permissions(self):
+        sub = Urn(self.request.matchdict.get('subject'))
+        skip = int(self.request.params.get('skip', 0))
+        take = int(self.request.params.get('take', 50000))
+        return self._get_permissions(sub, skip, take)
+
     @route(HTTPMethod.GET, '/list')
     def get_my_permissions(self):
         sub = UserUrn(self.request.session.user_id)
@@ -36,7 +43,7 @@ class PermissionApiV1(Api):
     def _get_permission(sub: Urn, obj: Urn):
         with create_transaction() as transaction:
             permission = transaction.query(PermissionSql) \
-                .filter((PermissionSql.subject == sub) & (PermissionSql.object == obj))\
+                .filter((PermissionSql.subject == str(sub)) & (PermissionSql.object == str(obj)))\
                 .first()
             return HTTPOk(permission.val()) if permission is not None \
                 else HTTPNotFound(Permission(sub, obj, Permissions.Null))
@@ -45,7 +52,7 @@ class PermissionApiV1(Api):
     def _get_permissions(sub: Urn, skip: int, take: int):
         with create_transaction() as transaction:
             count = transaction.query(PermissionSql) \
-                .filter(PermissionSql.subject == sub) \
+                .filter(PermissionSql.subject == str(sub)) \
                 .count()
 
             if count == 0 or skip >= count:

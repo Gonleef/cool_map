@@ -119,12 +119,14 @@ class AnswerSql(Base):
     id = __table__.c.Id
     respondent_id = __table__.c.RespondentId
     form_id = __table__.c.FormId
+    place_id = __table__.c.PlaceId
     answer = __table__.c.Answer
 
-    def __init__(self, respondent_id: str, form_id: str, answer: str, id: str = None):
+    def __init__(self, respondent_id: str, form_id: str, place_id: str, answer: str, id: str = None):
         self.id = id if id is not None else str(uuid.uuid4())
         self.respondent_id = respondent_id
         self.form_id = form_id
+        self.place_id = place_id
         self.answer = answer
 
     def val(self):
@@ -132,6 +134,7 @@ class AnswerSql(Base):
             self.id,
             self.respondent_id,
             self.form_id,
+            self.place_id,
             self.answer)
 
 

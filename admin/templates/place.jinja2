@@ -19,23 +19,9 @@
         </div>
     {% endif %}
 
-    {% if form %}
-    <h5>{{ form.title | e}}</h5>
-    <p>{{ form.description | e }}</p>
-
+    {% if place %}
     <form method="post">
-        {% for id in inputs %}
-            <div class="col-md-12 mb-3 mt-3">
-                <label for="{{ id }}">{{ inputs[id].label | e }}</label>
-                <input type="text" class="form-control" id="{{ id }}" name="{{ id }}" placeholder="Введите ответ" value="{{ inputs[id].answer }}">
-            </div>
-        {% endfor %}
-
-        <div class="input-group">
-            <hr>
-            <button type="submit" class="btn btn-sm btn-outline-primary mr-1">Изменить</button>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="location.href='/admin/answer/{{ answer_id }}?delete=true'">Удалить</button>
-        </div>
+        {{ place.id }}
     </form>
     {% endif %}
 {% endblock %}

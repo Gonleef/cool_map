@@ -134,20 +134,40 @@ class FormApiV1(Api):
             return HTTPOk(ItemsResult(items, skip, take, count))
 
     @route(HTTPMethod.GET, 'form/{form_id}/bindings')
-    def get_answers(self):
+    def get_places(self):
         form_id = self.request.matchdict.get('form_id')
         skip = int(self.request.matchdict.get('skip', 0))
         take = int(self.request.matchdict.get('take', 50000))
         with create_transaction() as transaction:
-            count = transaction.query(BindingSql)\
+            count = transaction.query(BindingSql) \
                 .join(PlaceSql, BindingSql.place_id == PlaceSql.id) \
                 .filter(BindingSql.form_id == form_id) \
                 .count()
             if count == 0 or skip >= count:
                 return HTTPNotFound(ItemsResult([], skip, take, count))
             answers = transaction.query(PlaceSql) \
-                .join(BindingSql, BindingSql.place_id == PlaceSql.id) \
-                .filter(BindingSql.form_id == form_id) \
+                          .join(BindingSql, BindingSql.place_id == PlaceSql.id) \
+                          .filter(BindingSql.form_id == form_id) \
                 [skip:take]
             items = list(map(lambda p: p.val().__dict__, answers))
             return HTTPOk(ItemsResult(items, skip, take, count))
+
+    @route(HTTPMethod.DELETE, 'form/{form_id}/place/{place_id}')
+    def delete_binding(self):
+        form_id = self.request.matchdict.get('form_id')
+        place_id = self.request.matchdict.get('place_id')
+        with create_transaction() as transaction:
+            deleted = transaction.query(BindingSql) \
+                .filter(BindingSql.form_id == form_id and BindingSql.place_id == place_id) \
+                .delete()
+            return HTTPOk() if deleted \
+                else HTTPNotFound(FailResultSimple('BindingNotFound', 'Привязка не найдена'))
+
+    @route(HTTPMethod.PUT, 'form/{form_id}/place/{place_id}')
+    def add_binding(self):
+        form_id = self.request.matchdict.get('form_id')
+        place_id = self.request.matchdict.get('place_id')
+        with create_transaction() as transaction:
+            binding = BindingSql(form_id, place_id)
+            transaction.add(binding)
+            return HTTPOk()

@@ -1,10 +1,5 @@
 {% extends "base.jinja2" %}
 
-{% block head %}{{ super() }}
-    <link rel="stylesheet" href="https://openlayers.org/en/v4.4.2/css/ol.css" type="text/css"/>
-    <script src="https://openlayers.org/en/v4.4.2/build/ol.js"></script>
-{% endblock %}
-
 {% block base_main %}
     {% if error %}
         <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
@@ -16,7 +11,7 @@
     {% endif %}
 
     <div class="alert alert-light" role="alert">
-        Для создания новой формы нажмите <a class="alert-link" href="/admin/place/{{ random_uuid }}?create=true">сюда</a>.
+        Для создания новой привзки нажмите <a class="alert-link" href="/admin/form/{{ form_id }}/place/add">сюда</a>.
     </div>
 
     {% if places %}
@@ -28,8 +23,8 @@
         <div class="card box-shadow">
             <div class="card-body">
                 {{ place.title | default(place.id) | e }}
-                <button type="button" class="btn btn-sm btn-outline-danger float-right border-0" onclick="location.href='/admin/place/{{ place.id }}'">Удалить</button>
-                <button type="button" class="btn btn-sm btn-outline-primary float-right border-0 mr-1" onclick="location.href='/admin/place/{{ place.id }}?delete=true'">Смотреть</button>
+                <button type="button" class="btn btn-sm btn-outline-danger float-right border-0" onclick="location.href='/admin/form/{{ form_id }}/place/{{ place.id }}?delete=true'">Удалить</button>
+                <!--button type="button" class="btn btn-sm btn-outline-primary float-right border-0 mr-1" onclick="location.href='/admin/place/{{ place.id }}'">Смотреть</button-->
             </div>
         </div>
     {% endfor %}

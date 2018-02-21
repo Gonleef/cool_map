@@ -7,8 +7,8 @@ from pyramid.request import Request
 from pyramid.view import view_config
 
 
-@view_config(route_name='places', renderer='templates/places.jinja2')
-class PlacesPage(object):
+@view_config(route_name='bindings', renderer='templates/bindings.jinja2')
+class BindingsPage(object):
     def __init__(self, context, request: Request):
         self.request = request
         self.context = context

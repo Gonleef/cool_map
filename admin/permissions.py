@@ -16,7 +16,7 @@ class PermissionsPage(object):
         client = ApiClient(ConfigurationWrapper.get_auth('admin'))
         skip = int(self.request.params.get('skip', 0))
         take = int(self.request.params.get('take', 50000))
-        result = client.permission_client.get_permissions(skip, take)
+        result = client.permission_client.get_user_permissions  (self.user.id, skip, take)
         if not result.is_success:
             raise Exception(result.data)
 

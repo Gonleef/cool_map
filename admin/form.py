@@ -52,7 +52,7 @@ class FormPage(object):
         result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.delete_form(form_id)
         if not result.is_success:
             logging.warning("Fail to delete form '%s': %s" % (form_id, result.data.message))
-        return HTTPOkWithRedirect('/admin/form/')
+        return HTTPOkWithRedirect('/admin/form')
 
     def edit(self):
         form_id = self.request.matchdict.get('form_id')

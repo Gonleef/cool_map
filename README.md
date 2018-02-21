@@ -23,6 +23,9 @@ git clone https://github.com/Gonleef/cool_map.git
 ```
 Scripts\pip install -e cool_map
 ```
+4. Edit settings 
+
+   Init fake db: `Scripts\python init_fake_db.py`
 5. Run the project.
 ```
 Scripts\pserve cool_map\develop.ini

@@ -15,6 +15,7 @@ def get_app(global_config, **settings):
     config.add_route('index', '/')
     config.add_route('enter', '/enter')
     config.add_route('exit', '/exit')
+    config.add_route('registration', '/registration')
     config.scan()
     config.add_notfound_view(lambda r: HTTPTemporaryRedirect('/'))
     config.set_default_permission(Permissions.Null)

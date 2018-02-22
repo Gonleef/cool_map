@@ -1,7 +1,12 @@
+.form-main {
+  display: flex;
+  height: 100vh;
+}
+
 .form-signin {
   width: 100%;
   max-width: 400px;
-  margin: 10% auto;
+  margin: auto;
 }
 
 .form-signin .form-control {
@@ -16,13 +21,13 @@
   z-index: 2;
 }
 
-.form-signin input[type="email"] {
+.form-signin#login input {
   margin-bottom: -1px;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
 
-.form-signin input[type="password"] {
+.form-signin#password input {
   margin-bottom: 10px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;

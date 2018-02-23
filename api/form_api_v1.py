@@ -82,6 +82,25 @@ class FormApiV1(Api):
             items = list(map(lambda p: p.val().__dict__, answers))
             return HTTPOk(ItemsResult(items, skip, take, count))
 
+    @route(HTTPMethod.GET, 'place/{place_id}/form')
+    def get_forms_by_place(self):
+            place_id = self.request.matchdict.get('place_id')
+            skip = int(self.request.matchdict.get('skip', 0))
+            take = int(self.request.matchdict.get('take', 50000))
+            with create_transaction() as transaction:
+                count = transaction.query(FormSql) \
+                    .join(BindingSql, BindingSql.form_id == FormSql.id) \
+                    .filter(BindingSql.place_id == place_id) \
+                    .count()
+                if count == 0 or skip >= count:
+                    return HTTPNotFound(ItemsResult([], skip, take, count))
+                answers = transaction.query(FormSql) \
+                    .join(BindingSql, BindingSql.form_id == FormSql.id) \
+                    .filter(BindingSql.place_id == place_id) \
+                    [skip:take]
+                items = list(map(lambda p: p.val().__dict__, answers))
+                return HTTPOk(ItemsResult(items, skip, take, count))
+
     @route(HTTPMethod.GET, 'answer/{id}')
     def get_answer(self):
         id = self.request.matchdict.get('id')
@@ -146,8 +165,8 @@ class FormApiV1(Api):
             if count == 0 or skip >= count:
                 return HTTPNotFound(ItemsResult([], skip, take, count))
             answers = transaction.query(PlaceSql) \
-                          .join(BindingSql, BindingSql.place_id == PlaceSql.id) \
-                          .filter(BindingSql.form_id == form_id) \
+                .join(BindingSql, BindingSql.place_id == PlaceSql.id) \
+                .filter(BindingSql.form_id == form_id) \
                 [skip:take]
             items = list(map(lambda p: p.val().__dict__, answers))
             return HTTPOk(ItemsResult(items, skip, take, count))

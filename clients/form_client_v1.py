@@ -106,6 +106,17 @@ class FormClient(object):
         data['items'] = list(map(lambda o: Form(**o), data.get('items', [])))
         return OperationResult.success(ItemsResult(**data))
 
+    def get_forms_place_id(self, place_id: str, skip: int = 0, take: int = 50000):
+        request = Request.blank('/api/form/v1/place/%s/form?skip=%d&take=%d' % (place_id, skip, take))
+        request.authorization = self.auth.get_session_id()
+        response = request.get_response()
+        data = json.loads(response.body.decode())
+        if response.status_code != HTTPStatus.OK and response.status_code != HTTPStatus.NOT_FOUND:
+            logging.warning('Fail to load forms for user ' + place_id + ': ' + data.get('error_message', ''))
+            return OperationResult.fail(FailResult(code=response.status_code, **data))
+        data['items'] = list(map(lambda o: Form(**o), data.get('items', [])))
+        return OperationResult.success(ItemsResult(**data))
+
     def get_bindings(self, form_id: str, skip: int = 0, take: int = 50000):
         request = Request.blank('/api/form/v1/form/%s/bindings?skip=%d&take=%d' % (form_id, skip, take))
         request.authorization = self.auth.get_session_id()

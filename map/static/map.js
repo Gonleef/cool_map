@@ -51,26 +51,25 @@
       map.on('click', function(evt) {
         var coordinate = evt.coordinate;
         var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-	console.log(data);
+	    console.log(data);
         var lon = data[0];
         var lat = data[1];
-        $.get("http://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon=" + lon + "&addressdetails=1", function(data) {
-            console.log(data);
-        });
-		content.innerHTML =
-				'<input type="hidden" name="lon" value="'+lon+'"/>' +
-				'<input type="hidden" name="lat" value="'+lat+'"/>' +
-				'<button id="send">Написать отзыв</button>';
-        overlay.setPosition(coordinate);
-       $("#send").click(function(){
-            var coordinate = evt.coordinate;
-            var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326').toString();
-            var lat = data.substring(data.indexOf(",") + 1,data.length);
-            var lon = data.substring(0, data.indexOf(","));
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/place/v1/geodecoding?lon=' + lon + '&lat=' + lat , true);
+            xhr.send();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState !== 4) return;
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.response.toString());
+                    content.innerHTML = '<form action="resolve"><input type="hidden" name="lon" value="'+lon+'"/>' +
+                    data.title + '<hr>' +
+                    '<button id="send">Написать отзыв</button></form><frame src="http://opennet.ru">';
+                    overlay.setPosition(coordinate);
 
+                }
 
-          });
-      });
+            }
+            });
 
 
 

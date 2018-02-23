@@ -1,7 +1,6 @@
 * {
     margin: 0;
     padding: 0;
-    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -10,7 +9,7 @@
     height: 100%;
 }
 
-  .ol-popup {
+.ol-popup {
         position: absolute;
         background-color: white;
         -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));

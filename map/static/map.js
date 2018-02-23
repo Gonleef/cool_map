@@ -1,4 +1,4 @@
-$(document).ready(function() {
+﻿$(document).ready(function() {
       var container = document.getElementById('popup');
       var content = document.getElementById('popup-content');
       var closer = document.getElementById('popup-closer');
@@ -51,8 +51,9 @@ $(document).ready(function() {
       map.on('click', function(evt) {
         var coordinate = evt.coordinate;
         var data = ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326');
-        var lon = data.substring(data[0]);
-        var lat = data.substring(data[1]);
+	console.log(data);
+        var lon = data[0];
+        var lat = data[1];
         $.get("http://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon=" + lon + "&addressdetails=1", function(data) {
             console.log(data);
         });

@@ -1,13 +1,6 @@
 import sqlite3
 
 command = """
---
--- Файл сгенерирован с помощью SQLiteStudio v3.1.1 в Чт фев 22 00:25:57 2018
---
--- Использованная кодировка текста: System
---
-PRAGMA foreign_keys = off;
-BEGIN TRANSACTION;
 
 -- Таблица: Answer
 DROP TABLE IF EXISTS Answer;
@@ -384,10 +377,6 @@ INSERT INTO User (
                      '123123',
                      NULL
                  );
-
-
-COMMIT TRANSACTION;
-PRAGMA foreign_keys = on;
 
 """
 

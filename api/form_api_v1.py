@@ -54,7 +54,8 @@ class FormApiV1(Api):
         id = self.request.matchdict.get('id')
         data = self.request.body.decode()
         data = json.loads(data)
-        form = FormSql(id=id, **data)
+        data["id"] = id
+        form = FormSql(**data)
         try:
             with create_transaction() as transaction:
                 transaction.add(form)
@@ -131,6 +132,20 @@ class FormApiV1(Api):
                 .update({AnswerSql.answer: answer})
             return HTTPOk() if patched \
                 else HTTPNotFound(FailResultSimple('AnswerNotFound', 'Ответ не найдена'))
+
+    @route(HTTPMethod.PUT, 'answer/{id}')
+    def put_answer(self):
+        id = self.request.matchdict.get('id')
+        data = self.request.body.decode()
+        data = json.loads(data)
+        data["id"] = id
+        answer = AnswerSql(**data)
+        try:
+            with create_transaction() as transaction:
+                transaction.add(answer)
+            return HTTPOk()
+        except IntegrityError:
+            return HTTPNotFound(FailResultSimple('AnswerNotCreated', 'Ответ не создана'))
 
     @route(HTTPMethod.GET, 'user/{user_id}/answer')
     def get_answers(self):

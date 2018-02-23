@@ -72,7 +72,7 @@ class FormPage(object):
 
     def put(self):
         form_id = self.request.matchdict.get('form_id')
-        result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.create_form(form_id, self.user.id)
+        result = ApiClient(ConfigurationWrapper.get_auth('admin')).form_client.create_form(self.user.id, id=form_id)
         if not result.is_success:
             return {
                 'user': self.user,

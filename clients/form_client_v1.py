@@ -1,5 +1,6 @@
 import json
 import logging
+import uuid
 from http import HTTPStatus
 
 from clients.auth_provider import IAuthProvider
@@ -39,6 +40,24 @@ class FormClient(object):
         return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
             else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
 
+    def create_answer(self, respondent_id: str, form_id: str, place_id: str, answer: str = '{}', id: str = None):
+        id = id if not None else str(uuid.uuid4())
+        request = Request.blank('/api/form/v1/answer/' + id)
+        request.authorization = self.auth.get_session_id()
+        request.method = HTTPMethod.PUT.value
+
+        data = Answer(
+            id,
+            respondent_id,
+            form_id,
+            place_id,
+            answer
+        )
+        request.body = json.dumps(data.__dict__).encode()
+        response = request.get_response()
+        return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
+            else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
+
     def get_answers(self, user_id: str, skip: int = 0, take: int = 50000):
         request = Request.blank('/api/form/v1/user/%s/answer?skip=%d&take=%d' % (user_id, skip, take))
         request.authorization = self.auth.get_session_id()
@@ -72,17 +91,19 @@ class FormClient(object):
         return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
             else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
 
-    def create_form(self, id: str, creator: str, title: str = None, description: str = None, content: str = '{}'):
+    def create_form(self, creator: str, title: str = None, description: str = None, content: str = '{}', id: str = None):
+        id = id if not None else str(uuid.uuid4())
         request = Request.blank('/api/form/v1/form/' + id)
         request.authorization = self.auth.get_session_id()
         request.method = HTTPMethod.PUT.value
-        data = {
-            'creator': creator,
-            'title': title if title is not None else 'Форма ' + id,
-            'description': description if description is not None else '',
-            'content': content if content is not None else '{}'
-        }
-        request.body = json.dumps(data).encode()
+
+        form = Form(
+            id,
+            creator,
+            title if title is not None else 'Форма ' + id,
+            description if description is not None else '',
+            content if content is not None else '{}')
+        request.body = json.dumps(form.__dict__).encode()
         response = request.get_response()
         return OperationResult.success(True) if response.status_code == HTTPStatus.OK \
             else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))

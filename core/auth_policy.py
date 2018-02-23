@@ -47,7 +47,7 @@ class AuthorizationPolicy(object):
         permissions_result = self.client.permission_client\
             .get_user_permission(request.session.user_id, obj)
         if not permissions_result.is_success:
-            return Permissions.Null
+            return False
         return permission in permissions_result.data
 
     def authenticated_userid(self, request: Request):

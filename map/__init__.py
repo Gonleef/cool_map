@@ -16,6 +16,8 @@ def get_app(global_config, **settings):
     config.add_route('enter', '/enter')
     config.add_route('exit', '/exit')
     config.add_route('anketa', '/anketa')
+    config.add_route('xXx_PRO100anketka228_xXx', '/xXx_PRO100anketka228_xXx')
+    config.add_route('choose', '/choose')
     config.add_route('registration', '/registration')
     config.scan()
     config.add_notfound_view(lambda r: HTTPTemporaryRedirect('/'))

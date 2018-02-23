@@ -55,15 +55,16 @@
         var lon = data[0];
         var lat = data[1];
         var xhr = new XMLHttpRequest();
+        console.log(lon);
         xhr.open('GET', '/api/place/v1/geodecoding?lon=' + lon + '&lat=' + lat , true);
             xhr.send();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState !== 4) return;
                 if (xhr.status === 200) {
                     var data = JSON.parse(xhr.response.toString());
-                    content.innerHTML = '<form action="resolve"><input type="hidden" name="lon" value="'+lon+'"/>' +
-                    data.title + '<hr>' +
-                    '<button id="send">Написать отзыв</button></form><frame src="http://opennet.ru">';
+                    console.log(data);
+                    content.innerHTML = '<form action="choose" method="post"><input type="hidden" name="place_id" value="'+data.id+'"/>' + '<hr>' +
+                    '<button id="send">Написать отзыв</button></form>';
                     overlay.setPosition(coordinate);
 
                 }

@@ -41,7 +41,7 @@ class FormClient(object):
             else OperationResult.fail(FailResult(code=response.status_code, **json.loads(response.body.decode())))
 
     def create_answer(self, respondent_id: str, form_id: str, place_id: str, answer: str = '{}', id: str = None):
-        id = id if not None else str(uuid.uuid4())
+        id = id if id else str(uuid.uuid4())
         request = Request.blank('/api/form/v1/answer/' + id)
         request.authorization = self.auth.get_session_id()
         request.method = HTTPMethod.PUT.value
